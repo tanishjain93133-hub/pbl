@@ -10,6 +10,7 @@ def create_app():
         template_folder=os.path.join(base_dir, 'templates'),
         static_folder=os.path.join(base_dir, 'static')
     )
+    app.url_map.strict_slashes = False
     app.config.from_object(Config)
 
     # Register DB teardown
