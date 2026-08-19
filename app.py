@@ -5,10 +5,26 @@ from database.db import close_db, query_db
 
 def create_app():
     base_dir = os.path.dirname(os.path.abspath(__file__))
+    template_candidates = [
+        os.path.join(base_dir, 'templates'),
+        os.path.join(os.path.dirname(base_dir), 'templates'),
+        os.path.join(os.getcwd(), 'templates'),
+        '/var/task/templates'
+    ]
+    template_dir = next((p for p in template_candidates if os.path.exists(p)), os.path.join(base_dir, 'templates'))
+    
+    static_candidates = [
+        os.path.join(base_dir, 'static'),
+        os.path.join(os.path.dirname(base_dir), 'static'),
+        os.path.join(os.getcwd(), 'static'),
+        '/var/task/static'
+    ]
+    static_dir = next((p for p in static_candidates if os.path.exists(p)), os.path.join(base_dir, 'static'))
+
     app = Flask(
         __name__,
-        template_folder=os.path.join(base_dir, 'templates'),
-        static_folder=os.path.join(base_dir, 'static')
+        template_folder=template_dir,
+        static_folder=static_dir
     )
     app.url_map.strict_slashes = False
     app.config.from_object(Config)
@@ -69,7 +85,17 @@ def create_app():
 
     @app.errorhandler(500)
     def internal_error(e):
-        return render_template('errors/500.html'), 500
+        try:
+            return render_template('errors/500.html'), 500
+        except Exception:
+            return "<h1>500 Internal Server Error</h1>", 500
+
+    @app.errorhandler(Exception)
+    def unhandled_exception(e):
+        try:
+            return render_template('errors/500.html'), 500
+        except Exception:
+            return f"<h1>Application Error</h1><p>{str(e)}</p>", 500
 
     return app
 
