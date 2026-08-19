@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard — SmartPark Control Center{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- Admin Sidebar Navigation -->
+    <aside class="app-sidebar bg-dark">
+        <div class="sidebar-title text-warning">Admin Console</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.dashboard') }}" class="active">
+                    <i class="bi bi-speedometer2"></i> <span>Admin Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.slots') }}">
+                    <i class="bi bi-p-square"></i> <span>Manage Slots</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.users') }}">
+                    <i class="bi bi-people"></i> <span>Campus Users</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.bookings') }}">
+                    <i class="bi bi-receipt"></i> <span>All Bookings</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.history') }}">
+                    <i class="bi bi-clock-history"></i> <span>Campus History</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-title mt-4 text-muted">System & User View</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{{ url_for('booking.parking') }}">
+                    <i class="bi bi-grid-3x3-gap"></i> <span>Live Parking View</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('future_scope') }}">
+                    <i class="bi bi-rocket-takeoff"></i> <span>PBL-II Roadmap</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('auth.logout') }}" class="text-danger">
+                    <i class="bi bi-box-arrow-right text-danger"></i> <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="app-main">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <div class="badge bg-warning text-dark fw-bold mb-1">Administrative Center</div>
+                <h2 class="mb-1">Campus Parking Dashboard</h2>
+                <p class="text-secondary small mb-0">Real-time facility telemetry, user accounts, and slot reservations.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('admin.slots') }}" class="btn btn-warning btn-sm fw-bold">
+                    <i class="bi bi-plus-lg me-1"></i> Add Parking Slot
+                </a>
+                <a href="{{ url_for('admin.bookings') }}" class="btn btn-outline-sp btn-sm">
+                    <i class="bi bi-receipt me-1"></i> Manage Bookings
+                </a>
+            </div>
+        </div>
+
+        <!-- 8 KPI Metrics Grid -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-blue">
+                        <i class="bi bi-p-square"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ stats.total_slots }}</div>
+                        <div class="stat-label">Total Slots</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-green">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ stats.available_slots }}</div>
+                        <div class="stat-label">Available Slots</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-red">
+                        <i class="bi bi-slash-circle"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ stats.occupied_slots }}</div>
+                        <div class="stat-label">Occupied Slots</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-amber">
+                        <i class="bi bi-tools"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ stats.maintenance_slots }}</div>
+                        <div class="stat-label">In Maintenance</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-purple">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ stats.total_users }}</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-blue">
+                        <i class="bi bi-receipt"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ stats.total_bookings }}</div>
+                        <div class="stat-label">Total Bookings</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-green">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ stats.active_bookings }}</div>
+                        <div class="stat-label">Active Bookings</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-purple">
+                        <i class="bi bi-check2-all"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ stats.completed_bookings }}</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parking Overview Visual Grid -->
+        <div class="sp-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>Campus Parking Bay Overview</h5>
+                <a href="{{ url_for('admin.slots') }}" class="small text-primary fw-bold text-decoration-none">Manage Slots</a>
+            </div>
+
+            <div class="row g-2">
+                {% for s in slots %}
+                    <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+                        <div class="p-2 rounded-3 border text-center {% if s.status == 'available' %}bg-success bg-opacity-10 border-success{% elif s.status == 'occupied' %}bg-danger bg-opacity-10 border-danger{% else %}bg-warning bg-opacity-10 border-warning{% endif %}">
+                            <div class="fw-extrabold fs-5">{{ s.slot_number }}</div>
+                            <div class="text-muted" style="font-size:0.7rem;">{{ s.section }}</div>
+                            <span class="badge {% if s.status == 'available' %}bg-success{% elif s.status == 'occupied' %}bg-danger{% else %}bg-warning text-dark{% endif %}" style="font-size:0.65rem;">
+                                {{ s.status }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Campus Bookings Table -->
+        <div class="sp-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-receipt text-primary me-2"></i>Recent Campus Reservations</h5>
+                <a href="{{ url_for('admin.bookings') }}" class="small text-primary fw-bold text-decoration-none">View All Bookings</a>
+            </div>
+
+            {% if recent_bookings %}
+                <div class="table-responsive">
+                    <table class="sp-table">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Student / User</th>
+                                <th>Vehicle</th>
+                                <th>Slot</th>
+                                <th>Date & Window</th>
+                                <th>Status</th>
+                                <th class="text-end">Quick Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in recent_bookings %}
+                                <tr>
+                                    <td><span class="fw-bold text-primary">#SP-{{ b.id }}</span></td>
+                                    <td>
+                                        <div class="fw-bold">{{ b.user_name }}</div>
+                                        <div class="text-muted small">{{ b.user_email }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">{{ b.vehicle_number }}</span>
+                                        <div class="text-muted small">{{ b.vehicle_type }}</div>
+                                    </td>
+                                    <td>
+                                        <strong class="text-primary">{{ b.slot_number }}</strong>
+                                        <div class="text-muted small">{{ b.section }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ b.booking_date }}</div>
+                                        <div class="text-muted small">{{ b.start_time }} – {{ b.end_time }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-status-{{ b.booking_status }} px-2 py-1 text-uppercase fw-semibold" style="font-size:0.75rem;">
+                                            {{ b.booking_status }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown">
+                                                Update
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                                <li>
+                                                    <form method="POST" action="{{ url_for('admin.update_booking_status', booking_id=b.id) }}">
+                                                        <input type="hidden" name="status" value="active">
+                                                        <button type="submit" class="dropdown-item py-2 text-success"><i class="bi bi-play-circle me-2"></i>Mark Active (Parked)</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form method="POST" action="{{ url_for('admin.update_booking_status', booking_id=b.id) }}">
+                                                        <input type="hidden" name="status" value="completed">
+                                                        <button type="submit" class="dropdown-item py-2 text-secondary"><i class="bi bi-check2-circle me-2"></i>Mark Completed (Exited)</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form method="POST" action="{{ url_for('admin.update_booking_status', booking_id=b.id) }}">
+                                                        <input type="hidden" name="status" value="cancelled">
+                                                        <button type="submit" class="dropdown-item py-2 text-danger"><i class="bi bi-x-circle me-2"></i>Cancel Booking</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state p-4">
+                    <p class="text-secondary small mb-0">No booking records found in the database.</p>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

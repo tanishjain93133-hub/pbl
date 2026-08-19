@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}My Parking Bookings — SmartPark{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- User Sidebar Navigation -->
+    <aside class="app-sidebar">
+        <div class="sidebar-title">Main Menu</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.dashboard') }}">
+                    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('booking.parking') }}">
+                    <i class="bi bi-grid-3x3-gap"></i> <span>Parking Slots</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('booking.my_bookings') }}" class="active">
+                    <i class="bi bi-calendar-check"></i> <span>My Bookings</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.vehicles') }}">
+                    <i class="bi bi-car-front"></i> <span>My Vehicles</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.history') }}">
+                    <i class="bi bi-clock-history"></i> <span>Vehicle History</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.profile') }}">
+                    <i class="bi bi-person-gear"></i> <span>My Profile</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="app-main">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <h2 class="mb-1">My Parking Bookings</h2>
+                <p class="text-secondary small mb-0">Track and manage all your scheduled, active, and past parking reservations.</p>
+            </div>
+            <a href="{{ url_for('booking.parking') }}" class="btn btn-primary-sp">
+                <i class="bi bi-plus-circle me-1"></i> New Booking
+            </a>
+        </div>
+
+        <!-- Filter Status Navigation Tabs -->
+        <div class="sp-card p-2 mb-4 d-inline-flex flex-wrap gap-1 bg-white border">
+            <a href="{{ url_for('booking.my_bookings') }}" class="btn btn-sm {% if not selected_status %}btn-primary-sp{% else %}btn-light text-secondary{% endif %}">
+                All Bookings
+            </a>
+            <a href="{{ url_for('booking.my_bookings', status='booked') }}" class="btn btn-sm {% if selected_status == 'booked' %}btn-primary{% else %}btn-light text-secondary{% endif %}">
+                Scheduled (Booked)
+            </a>
+            <a href="{{ url_for('booking.my_bookings', status='active') }}" class="btn btn-sm {% if selected_status == 'active' %}btn-success text-white{% else %}btn-light text-secondary{% endif %}">
+                Active
+            </a>
+            <a href="{{ url_for('booking.my_bookings', status='completed') }}" class="btn btn-sm {% if selected_status == 'completed' %}btn-secondary{% else %}btn-light text-secondary{% endif %}">
+                Completed
+            </a>
+            <a href="{{ url_for('booking.my_bookings', status='cancelled') }}" class="btn btn-sm {% if selected_status == 'cancelled' %}btn-danger{% else %}btn-light text-secondary{% endif %}">
+                Cancelled
+            </a>
+        </div>
+
+        {% if bookings %}
+            <div class="sp-card p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="sp-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>Slot Number</th>
+                                <th>Vehicle</th>
+                                <th>Date</th>
+                                <th>Time Interval</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in bookings %}
+                                <tr>
+                                    <td><span class="fw-bold text-primary">#SP-{{ b.id }}</span></td>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ b.slot_number }}</div>
+                                        <div class="text-muted small">{{ b.section }} • {{ b.floor }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">{{ b.vehicle_number }}</div>
+                                        <div class="text-muted small">{{ b.vehicle_type }} ({{ b.vehicle_model }})</div>
+                                    </td>
+                                    <td>{{ b.booking_date }}</td>
+                                    <td>{{ b.start_time }} – {{ b.end_time }}</td>
+                                    <td>
+                                        <span class="badge badge-status-{{ b.booking_status }} px-2 py-1 text-uppercase fw-semibold" style="font-size:0.75rem;">
+                                            {{ b.booking_status }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <a href="{{ url_for('booking.confirmation', booking_id=b.id) }}" class="btn btn-outline-secondary btn-sm py-1 px-2" title="View Digital Receipt">
+                                                <i class="bi bi-receipt"></i>
+                                            </a>
+                                            {% if b.booking_status in ['booked', 'active'] %}
+                                                <form method="POST" action="{{ url_for('booking.cancel_booking', booking_id=b.id) }}" 
+                                                      onsubmit="return confirm('Are you sure you want to cancel booking #SP-{{ b.id }}? This will release slot {{ b.slot_number }}.');" class="d-inline">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm py-1 px-2" title="Cancel Booking">
+                                                        <i class="bi bi-x-lg"></i> Cancel
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+                <h4>No Bookings Found</h4>
+                <p class="text-secondary small mb-3">You don't have any parking bookings matching the selected filter.</p>
+                <a href="{{ url_for('booking.parking') }}" class="btn btn-primary-sp btn-sm">
+                    <i class="bi bi-search me-1"></i> Find a Parking Slot
+                </a>
+            </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

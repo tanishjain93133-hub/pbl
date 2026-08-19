@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}SmartPark — Smart Parking Management for a Smarter Campus{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="hero-badge">
+                    <i class="bi bi-patch-check-fill text-info"></i>
+                    <span>College Campus Smart Parking • PBL-I</span>
+                </div>
+                <h1 class="hero-title">
+                    Smart Parking Management for a Smarter Campus
+                </h1>
+                <p class="hero-subtitle">
+                    Find available parking slots, reserve your space and manage your parking history from one simple platform.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="{{ url_for('booking.parking') }}" class="btn btn-primary-sp btn-lg px-4 py-3">
+                        <i class="bi bi-search me-2"></i> Find Parking
+                    </a>
+                    {% if session.get('user_id') %}
+                        <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-light btn-lg px-4 py-3">
+                            <i class="bi bi-speedometer2 me-2"></i> Open Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg px-4 py-3">
+                            <i class="bi bi-person-plus me-2"></i> Get Started
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Quick Stats Strip -->
+                <div class="row g-3 pt-3 border-top border-secondary border-opacity-50">
+                    <div class="col-4">
+                        <div class="text-white fw-bold fs-3">{{ stats.total_slots or '14' }}+</div>
+                        <div class="text-secondary small">Campus Slots</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-success fw-bold fs-3">{{ stats.available_slots or '8' }}</div>
+                        <div class="text-secondary small">Available Now</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-info fw-bold fs-3">100%</div>
+                        <div class="text-secondary small">Paperless</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <!-- Visual CSS Interactive Parking Mockup -->
+                <div class="hero-mockup">
+                    <div class="mockup-header justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="dot dot-red"></span>
+                            <span class="dot dot-yellow"></span>
+                            <span class="dot dot-green"></span>
+                            <span class="text-white small fw-bold ms-2">Live Campus Bay • Ground Floor</span>
+                        </div>
+                        <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50">Active</span>
+                    </div>
+
+                    <div class="mock-slot-grid mb-3">
+                        <div class="mock-slot avail">
+                            <div>A01</div>
+                            <span class="badge bg-success mt-1" style="font-size: 0.65rem;">Available</span>
+                        </div>
+                        <div class="mock-slot occ">
+                            <div>A02</div>
+                            <span class="badge bg-danger mt-1" style="font-size: 0.65rem;">Occupied</span>
+                        </div>
+                        <div class="mock-slot avail">
+                            <div>A03</div>
+                            <span class="badge bg-success mt-1" style="font-size: 0.65rem;">Available</span>
+                        </div>
+                        <div class="mock-slot avail">
+                            <div>A04</div>
+                            <span class="badge bg-success mt-1" style="font-size: 0.65rem;">Available</span>
+                        </div>
+                        <div class="mock-slot maint">
+                            <div>A05</div>
+                            <span class="badge bg-warning text-dark mt-1" style="font-size: 0.65rem;">Maint.</span>
+                        </div>
+                        <div class="mock-slot occ">
+                            <div>A06</div>
+                            <span class="badge bg-danger mt-1" style="font-size: 0.65rem;">Occupied</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-dark bg-opacity-50 rounded-3 p-3 text-white small border border-secondary border-opacity-25">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-secondary">Selected Slot:</span>
+                            <span class="fw-bold text-info">A03 (Section A)</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-secondary">Vehicle Type:</span>
+                            <span>Car / 4-Wheeler</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-secondary">Status:</span>
+                            <span class="text-success fw-bold">Ready to Book</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="text-primary fw-bold text-uppercase small letter-spacing-1">Simple 3-Step Process</span>
+            <h2 class="mt-1">How It Works</h2>
+            <p class="text-secondary">Experience hassle-free campus parking in three simple steps.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Step 1 -->
+            <div class="col-md-4">
+                <div class="sp-card h-100 text-center p-4">
+                    <div class="stat-icon-wrapper icon-blue mx-auto mb-3" style="width:68px; height:68px; font-size:1.8rem;">
+                        <span class="fw-extrabold fs-4">01</span>
+                    </div>
+                    <h4 class="mb-2">Find a Slot</h4>
+                    <p class="text-secondary small mb-0">
+                        Check real-time parking slot availability across different sections and floors of the campus parking zones.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="col-md-4">
+                <div class="sp-card h-100 text-center p-4">
+                    <div class="stat-icon-wrapper icon-green mx-auto mb-3" style="width:68px; height:68px; font-size:1.8rem;">
+                        <span class="fw-extrabold fs-4">02</span>
+                    </div>
+                    <h4 class="mb-2">Book Your Slot</h4>
+                    <p class="text-secondary small mb-0">
+                        Select your registered vehicle, date, time window and reserve your parking slot without overlapping conflicts.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="col-md-4">
+                <div class="sp-card h-100 text-center p-4">
+                    <div class="stat-icon-wrapper icon-purple mx-auto mb-3" style="width:68px; height:68px; font-size:1.8rem;">
+                        <span class="fw-extrabold fs-4">03</span>
+                    </div>
+                    <h4 class="mb-2">Park Smart</h4>
+                    <p class="text-secondary small mb-0">
+                        Use your confirmed digital booking slip, park safely in your designated bay, and monitor your full history.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5" style="background-color: #f8fafc;">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="text-primary fw-bold text-uppercase small">Core Features</span>
+            <h2 class="mt-1">Built for Campus Efficiency</h2>
+            <p class="text-secondary">Key capabilities engineered for student, faculty, and administrative operations.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="sp-card h-100 sp-card-hover">
+                    <div class="stat-icon-wrapper icon-green mb-3">
+                        <i class="bi bi-grid-fill"></i>
+                    </div>
+                    <h5 class="mb-2">Real-Time Availability</h5>
+                    <p class="text-secondary small mb-0">
+                        Quickly see available, occupied, and maintenance parking slots with color-coded live status cards.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="sp-card h-100 sp-card-hover">
+                    <div class="stat-icon-wrapper icon-blue mb-3">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+                    <h5 class="mb-2">Easy Booking</h5>
+                    <p class="text-secondary small mb-0">
+                        Reserve a parking slot in a few clicks with intelligent time-conflict checking and instant confirmation slips.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="sp-card h-100 sp-card-hover">
+                    <div class="stat-icon-wrapper icon-amber mb-3">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <h5 class="mb-2">Vehicle History</h5>
+                    <p class="text-secondary small mb-0">
+                        View comprehensive past vehicle entry, exit, and booking records with date and status filters.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="sp-card h-100 sp-card-hover">
+                    <div class="stat-icon-wrapper icon-purple mb-3">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <h5 class="mb-2">Admin Management</h5>
+                    <p class="text-secondary small mb-0">
+                        Administrators can dynamically manage parking slots, registered users, booking statuses, and campus logs.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Future Scope Banner -->
+<section class="py-5 bg-white border-top">
+    <div class="container">
+        <div class="sp-card bg-light border-0 p-4 p-md-5 rounded-4 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
+            <div>
+                <span class="badge bg-primary text-white mb-2">Roadmap • PBL-II</span>
+                <h3 class="mb-2">Exploring Advanced Smart-Campus Integrations</h3>
+                <p class="text-secondary mb-0 max-w-600">
+                    ANPR camera recognition, IoT occupancy sensors, live GIS parking maps, and digital payment gateways are scheduled for PBL-II.
+                </p>
+            </div>
+            <a href="{{ url_for('future_scope') }}" class="btn btn-outline-sp px-4 py-2 text-nowrap">
+                <i class="bi bi-arrow-right-circle me-1"></i> View Future Scope
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

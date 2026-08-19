@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}User Registration — SmartPark{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="sp-card shadow-md p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="logo-badge mx-auto mb-3" style="width:48px; height:48px; font-size:1.5rem;">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    <h3 class="fw-bold">Create SmartPark Account</h3>
+                    <p class="text-secondary small">Register to book parking bays and register campus vehicles</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-semibold small">Full Name <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" id="name" name="name" 
+                                   value="{{ name or '' }}" placeholder="John Doe" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label for="email" class="form-label fw-semibold small">Email Address <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                                <input type="email" class="form-control border-start-0 ps-0" id="email" name="email" 
+                                       value="{{ email or '' }}" placeholder="student@campus.edu" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="phone" class="form-label fw-semibold small">Phone Number <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone text-muted"></i></span>
+                                <input type="tel" class="form-control border-start-0 ps-0" id="phone" name="phone" 
+                                       value="{{ phone or '' }}" placeholder="9876543210" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6">
+                            <label for="password" class="form-label fw-semibold small">Password <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                                <input type="password" class="form-control border-start-0 border-end-0 ps-0" id="password" name="password" 
+                                       placeholder="Min 6 characters" required>
+                                <button type="button" class="btn bg-light border border-start-0" onclick="togglePassword('password', 'toggleRegEye1')">
+                                    <i class="bi bi-eye text-muted" id="toggleRegEye1"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="confirm_password" class="form-label fw-semibold small">Confirm Password <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-shield-check text-muted"></i></span>
+                                <input type="password" class="form-control border-start-0 border-end-0 ps-0" id="confirm_password" name="confirm_password" 
+                                       placeholder="Repeat password" required>
+                                <button type="button" class="btn bg-light border border-start-0" onclick="togglePassword('confirm_password', 'toggleRegEye2')">
+                                    <i class="bi bi-eye text-muted" id="toggleRegEye2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-sp w-100 py-2 justify-content-center mb-3">
+                        <i class="bi bi-check-circle-fill me-1"></i> Register Account
+                    </button>
+
+                    <div class="text-center small text-secondary">
+                        Already have an account? 
+                        <a href="{{ url_for('auth.login') }}" class="text-primary fw-bold text-decoration-none">Sign In here</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

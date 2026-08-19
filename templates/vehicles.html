@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}My Vehicles — SmartPark{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- User Sidebar Navigation -->
+    <aside class="app-sidebar">
+        <div class="sidebar-title">Main Menu</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.dashboard') }}">
+                    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('booking.parking') }}">
+                    <i class="bi bi-grid-3x3-gap"></i> <span>Parking Slots</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('booking.my_bookings') }}">
+                    <i class="bi bi-calendar-check"></i> <span>My Bookings</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.vehicles') }}" class="active">
+                    <i class="bi bi-car-front"></i> <span>My Vehicles</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.history') }}">
+                    <i class="bi bi-clock-history"></i> <span>Vehicle History</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.profile') }}">
+                    <i class="bi bi-person-gear"></i> <span>My Profile</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="app-main">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <h2 class="mb-1">Registered Campus Vehicles</h2>
+                <p class="text-secondary small mb-0">Manage your two-wheelers and four-wheelers authorized for campus parking.</p>
+            </div>
+            <button type="button" class="btn btn-primary-sp" data-bs-toggle="modal" data-bs-target="#addVehicleModal">
+                <i class="bi bi-plus-lg me-1"></i> Register New Vehicle
+            </button>
+        </div>
+
+        {% if vehicles %}
+            <div class="row g-4">
+                {% for v in vehicles %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="sp-card h-100 d-flex flex-column justify-content-between position-relative">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="stat-icon-wrapper icon-blue">
+                                        {% if v.vehicle_type == 'Bike' %}
+                                            <i class="bi bi-bicycle"></i>
+                                        {% elif v.vehicle_type == 'Scooter' %}
+                                            <i class="bi bi-scooter"></i>
+                                        {% else %}
+                                            <i class="bi bi-car-front-fill"></i>
+                                        {% endif %}
+                                    </div>
+                                    <span class="badge bg-light text-secondary border">{{ v.vehicle_type }}</span>
+                                </div>
+
+                                <h4 class="fw-bold text-dark mb-1">{{ v.vehicle_number }}</h4>
+                                <p class="text-secondary small mb-3">{{ v.vehicle_model or 'Standard Model' }}</p>
+                            </div>
+
+                            <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="text-muted small" style="font-size:0.75rem;">Added: {{ v.created_at }}</span>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-2" 
+                                            data-bs-toggle="modal" data-bs-target="#editVehicleModal{{ v.id }}">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </button>
+                                    <form method="POST" action="{{ url_for('user.delete_vehicle', vehicle_id=v.id) }}" 
+                                          onsubmit="return confirm('Are you sure you want to delete vehicle {{ v.vehicle_number }}?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm py-1 px-2">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Modal for this vehicle -->
+                    <div class="modal fade" id="editVehicleModal{{ v.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg rounded-4">
+                                <div class="modal-header bg-light border-bottom">
+                                    <h5 class="modal-title fw-bold">Edit Vehicle ({{ v.vehicle_number }})</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="POST" action="{{ url_for('user.edit_vehicle', vehicle_id=v.id) }}">
+                                    <div class="modal-body p-4">
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Registration Number</label>
+                                            <input type="text" class="form-control text-uppercase" name="vehicle_number" 
+                                                   value="{{ v.vehicle_number }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Vehicle Type</label>
+                                            <select class="form-select" name="vehicle_type" required>
+                                                <option value="Car" {% if v.vehicle_type == 'Car' %}selected{% endif %}>Car (4-Wheeler)</option>
+                                                <option value="Bike" {% if v.vehicle_type == 'Bike' %}selected{% endif %}>Bike (2-Wheeler)</option>
+                                                <option value="Scooter" {% if v.vehicle_type == 'Scooter' %}selected{% endif %}>Scooter (2-Wheeler)</option>
+                                                <option value="Other" {% if v.vehicle_type == 'Other' %}selected{% endif %}>Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Vehicle Model / Make</label>
+                                            <input type="text" class="form-control" name="vehicle_model" 
+                                                   value="{{ v.vehicle_model }}">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer bg-light border-top">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary-sp">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-car-front"></i>
+                </div>
+                <h4>No Vehicles Registered Yet</h4>
+                <p class="text-secondary small mb-3">Add your car, bike, or scooter to reserve parking slots on campus.</p>
+                <button type="button" class="btn btn-primary-sp btn-sm" data-bs-toggle="modal" data-bs-target="#addVehicleModal">
+                    <i class="bi bi-plus-lg me-1"></i> Register Your First Vehicle
+                </button>
+            </div>
+        {% endif %}
+    </main>
+</div>
+
+<!-- Add Vehicle Modal -->
+<div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-light border-bottom">
+                <h5 class="modal-title fw-bold" id="addVehicleModalLabel">
+                    <i class="bi bi-car-front-fill text-primary me-2"></i>Register New Vehicle
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('user.add_vehicle') }}">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label for="vehicle_number" class="form-label small fw-bold">Vehicle Number <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control text-uppercase" id="vehicle_number" name="vehicle_number" 
+                               placeholder="e.g. GJ01AB1234" required autofocus>
+                        <div class="form-text">State plate code with letters and digits.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="vehicle_type" class="form-label small fw-bold">Vehicle Type <span class="text-danger">*</span></label>
+                        <select class="form-select" id="vehicle_type" name="vehicle_type" required>
+                            <option value="Car" selected>Car (4-Wheeler)</option>
+                            <option value="Bike">Bike (2-Wheeler)</option>
+                            <option value="Scooter">Scooter (2-Wheeler)</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="vehicle_model" class="form-label small fw-bold">Vehicle Model / Make</label>
+                        <input type="text" class="form-control" id="vehicle_model" name="vehicle_model" 
+                               placeholder="e.g. Honda City / Royal Enfield">
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary-sp">
+                        <i class="bi bi-check2 me-1"></i> Register Vehicle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

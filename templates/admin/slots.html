@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Parking Slots — SmartPark Admin{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- Admin Sidebar Navigation -->
+    <aside class="app-sidebar bg-dark">
+        <div class="sidebar-title text-warning">Admin Console</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="bi bi-speedometer2"></i> <span>Admin Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.slots') }}" class="active">
+                    <i class="bi bi-p-square"></i> <span>Manage Slots</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.users') }}">
+                    <i class="bi bi-people"></i> <span>Campus Users</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.bookings') }}">
+                    <i class="bi bi-receipt"></i> <span>All Bookings</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.history') }}">
+                    <i class="bi bi-clock-history"></i> <span>Campus History</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="app-main">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <h2 class="mb-1">Manage Campus Parking Slots</h2>
+                <p class="text-secondary small mb-0">Create new bays, configure bay parameters, and adjust operational availability.</p>
+            </div>
+            <button type="button" class="btn btn-warning fw-bold" data-bs-toggle="modal" data-bs-target="#addSlotModal">
+                <i class="bi bi-plus-lg me-1"></i> Add Parking Slot
+            </button>
+        </div>
+
+        <!-- Filter and Search Bar -->
+        <div class="sp-card mb-4">
+            <form method="GET" action="{{ url_for('admin.slots') }}" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="adminSlotSearch" class="form-label small fw-bold text-muted">Search Slots</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="adminSlotSearch" name="search" 
+                               value="{{ search or '' }}" placeholder="Search by slot, section, floor...">
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-md-3">
+                    <label for="adminSection" class="form-label small fw-bold text-muted">Section</label>
+                    <select name="section" id="adminSection" class="form-select form-select-sm">
+                        <option value="">All Sections</option>
+                        {% for sec in sections %}
+                            <option value="{{ sec }}" {% if selected_section == sec %}selected{% endif %}>{{ sec }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-sm-6 col-md-3">
+                    <label for="adminStatus" class="form-label small fw-bold text-muted">Operational Status</label>
+                    <select name="status" id="adminStatus" class="form-select form-select-sm">
+                        <option value="">All Statuses</option>
+                        <option value="available" {% if selected_status == 'available' %}selected{% endif %}>Available</option>
+                        <option value="occupied" {% if selected_status == 'occupied' %}selected{% endif %}>Occupied</option>
+                        <option value="maintenance" {% if selected_status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-sp btn-sm w-100 justify-content-center">
+                        Filter
+                    </button>
+                    <a href="{{ url_for('admin.slots') }}" class="btn btn-outline-secondary btn-sm" title="Reset">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        {% if slots %}
+            <div class="sp-card p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="sp-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Slot Number</th>
+                                <th>Section / Location</th>
+                                <th>Floor</th>
+                                <th>Designated Type</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in slots %}
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold fs-6 text-primary">{{ s.slot_number }}</span>
+                                    </td>
+                                    <td>{{ s.section }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ s.floor }}</span></td>
+                                    <td>{{ s.vehicle_type }}</td>
+                                    <td>
+                                        {% if s.status == 'available' %}
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">🟢 Available</span>
+                                        {% elif s.status == 'occupied' %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">🔴 Occupied</span>
+                                        {% else %}
+                                            <span class="badge bg-warning bg-opacity-10 text-warning text-dark border border-warning border-opacity-25 px-2 py-1">🟡 Maintenance</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-2" 
+                                                    data-bs-toggle="modal" data-bs-target="#editSlotModal{{ s.id }}">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
+                                            <form method="POST" action="{{ url_for('admin.delete_slot', slot_id=s.id) }}" 
+                                                  onsubmit="return confirm('Are you sure you want to delete Slot {{ s.slot_number }}?');" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm py-1 px-2">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Edit Slot Modal -->
+                                <div class="modal fade" id="editSlotModal{{ s.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 shadow-lg rounded-4">
+                                            <div class="modal-header bg-light border-bottom">
+                                                <h5 class="modal-title fw-bold">Edit Slot {{ s.slot_number }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="POST" action="{{ url_for('admin.edit_slot', slot_id=s.id) }}">
+                                                <div class="modal-body p-4">
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Slot Number</label>
+                                                        <input type="text" class="form-control text-uppercase" name="slot_number" value="{{ s.slot_number }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Section</label>
+                                                        <input type="text" class="form-control" name="section" value="{{ s.section }}" required>
+                                                    </div>
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-6">
+                                                            <label class="form-label small fw-bold">Floor Level</label>
+                                                            <input type="text" class="form-control" name="floor" value="{{ s.floor }}" required>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="form-label small fw-bold">Vehicle Type</label>
+                                                            <select class="form-select" name="vehicle_type" required>
+                                                                <option value="Car" {% if s.vehicle_type == 'Car' %}selected{% endif %}>Car</option>
+                                                                <option value="Bike" {% if s.vehicle_type == 'Bike' %}selected{% endif %}>Bike</option>
+                                                                <option value="Scooter" {% if s.vehicle_type == 'Scooter' %}selected{% endif %}>Scooter</option>
+                                                                <option value="Other" {% if s.vehicle_type == 'Other' %}selected{% endif %}>Other</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Status</label>
+                                                        <select class="form-select" name="status" required>
+                                                            <option value="available" {% if s.status == 'available' %}selected{% endif %}>Available</option>
+                                                            <option value="occupied" {% if s.status == 'occupied' %}selected{% endif %}>Occupied</option>
+                                                            <option value="maintenance" {% if s.status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer bg-light border-top">
+                                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary-sp">Save Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-p-square"></i>
+                </div>
+                <h4>No Slots Found</h4>
+                <p class="text-secondary small mb-3">No parking slots matched your search criteria.</p>
+                <a href="{{ url_for('admin.slots') }}" class="btn btn-primary-sp btn-sm">Reset Filter</a>
+            </div>
+        {% endif %}
+    </main>
+</div>
+
+<!-- Add Slot Modal -->
+<div class="modal fade" id="addSlotModal" tabindex="-1" aria-labelledby="addSlotModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-light border-bottom">
+                <h5 class="modal-title fw-bold" id="addSlotModalLabel">
+                    <i class="bi bi-p-square-fill text-warning me-2"></i>Add New Parking Slot
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.add_slot') }}">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label for="slot_number" class="form-label small fw-bold">Slot Number <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control text-uppercase" id="slot_number" name="slot_number" 
+                               placeholder="e.g. D01" required autofocus>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="section" class="form-label small fw-bold">Section / Wing <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="section" name="section" 
+                               placeholder="e.g. Section D - West Wing" required>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label for="floor" class="form-label small fw-bold">Floor <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="floor" name="floor" 
+                                   placeholder="e.g. Ground Floor / 2nd Floor" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="vehicle_type" class="form-label small fw-bold">Vehicle Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="vehicle_type" name="vehicle_type" required>
+                                <option value="Car" selected>Car</option>
+                                <option value="Bike">Bike</option>
+                                <option value="Scooter">Scooter</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="status" class="form-label small fw-bold">Initial Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="available" selected>Available</option>
+                            <option value="occupied">Occupied</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning fw-bold">Create Slot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

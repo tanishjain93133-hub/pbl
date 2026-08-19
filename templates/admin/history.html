@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Campus Vehicle History — SmartPark Admin{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- Admin Sidebar Navigation -->
+    <aside class="app-sidebar bg-dark">
+        <div class="sidebar-title text-warning">Admin Console</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="bi bi-speedometer2"></i> <span>Admin Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.slots') }}">
+                    <i class="bi bi-p-square"></i> <span>Manage Slots</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.users') }}">
+                    <i class="bi bi-people"></i> <span>Campus Users</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.bookings') }}">
+                    <i class="bi bi-receipt"></i> <span>All Bookings</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.history') }}" class="active">
+                    <i class="bi bi-clock-history"></i> <span>Campus History</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="app-main">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <h2 class="mb-1">Campus Vehicle Parking Logs</h2>
+                <p class="text-secondary small mb-0">Auditable history of all vehicle arrivals, exits, and bay occupancies across campus.</p>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="sp-card mb-4">
+            <form method="GET" action="{{ url_for('admin.history') }}" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="historySearch" class="form-label small fw-bold text-muted">Search Logs</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="historySearch" name="search" 
+                               value="{{ search or '' }}" placeholder="Search by vehicle, slot, or user name...">
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-md-3">
+                    <label for="adminHistStatus" class="form-label small fw-bold text-muted">Status</label>
+                    <select name="status" id="adminHistStatus" class="form-select form-select-sm">
+                        <option value="">All Statuses</option>
+                        <option value="Active" {% if selected_status == 'Active' %}selected{% endif %}>Active</option>
+                        <option value="Completed" {% if selected_status == 'Completed' %}selected{% endif %}>Completed</option>
+                        <option value="Cancelled" {% if selected_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                        <option value="Booked" {% if selected_status == 'Booked' %}selected{% endif %}>Booked</option>
+                    </select>
+                </div>
+
+                <div class="col-sm-6 col-md-3">
+                    <label for="adminHistSort" class="form-label small fw-bold text-muted">Sort By Timestamp</label>
+                    <select name="sort" id="adminHistSort" class="form-select form-select-sm">
+                        <option value="DESC" {% if sort_order == 'DESC' %}selected{% endif %}>Newest First</option>
+                        <option value="ASC" {% if sort_order == 'ASC' %}selected{% endif %}>Oldest First</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-sp btn-sm w-100 justify-content-center">
+                        Filter
+                    </button>
+                    <a href="{{ url_for('admin.history') }}" class="btn btn-outline-secondary btn-sm" title="Reset">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        {% if history %}
+            <div class="sp-card p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="sp-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Log ID</th>
+                                <th>Vehicle Plate</th>
+                                <th>Driver / User</th>
+                                <th>Slot Number</th>
+                                <th>Entry Timestamp</th>
+                                <th>Exit Timestamp</th>
+                                <th>Session Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for h in history %}
+                                <tr>
+                                    <td><span class="fw-bold text-muted">#LOG-{{ h.id }}</span></td>
+                                    <td><span class="badge bg-light text-dark border fw-bold">{{ h.vehicle_number }}</span></td>
+                                    <td>
+                                        {% if h.user_name %}
+                                            <div class="fw-semibold text-dark">{{ h.user_name }}</div>
+                                            <div class="text-muted small">{{ h.user_email }}</div>
+                                        {% else %}
+                                            <span class="text-muted small">Walk-in / Direct Session</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><strong class="text-primary">{{ h.slot_number }}</strong></td>
+                                    <td>
+                                        {% if h.entry_time %}
+                                            <span class="text-dark">{{ h.entry_time }}</span>
+                                        {% else %}
+                                            <span class="text-muted fst-italic">Pending Check-in</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if h.exit_time %}
+                                            <span class="text-dark">{{ h.exit_time }}</span>
+                                        {% else %}
+                                            <span class="text-muted fst-italic">Currently On Campus</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if h.status == 'Active' %}
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">Active</span>
+                                        {% elif h.status == 'Completed' %}
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2 py-1">Completed</span>
+                                        {% elif h.status == 'Cancelled' %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">Cancelled</span>
+                                        {% else %}
+                                            <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-2 py-1">{{ h.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <h4>No Parking Logs Found</h4>
+                <p class="text-secondary small mb-3">No campus parking logs matched the filter.</p>
+                <a href="{{ url_for('admin.history') }}" class="btn btn-primary-sp btn-sm">Reset Filter</a>
+            </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Parking Slot Availability — SmartPark{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header with Stats Strip -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="mb-1">Campus Parking Availability</h2>
+            <p class="text-secondary small mb-0">Live status of all parking zones across campus ground, upper, and basement floors.</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-secondary small fw-semibold">Status Legend:</span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge badge-available">🟢 Available</span>
+                <span class="badge badge-occupied">🔴 Occupied</span>
+                <span class="badge badge-maintenance">🟡 Maintenance</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar Card -->
+    <div class="sp-card mb-4">
+        <form method="GET" action="{{ url_for('booking.parking') }}" class="row g-3 align-items-end">
+            <div class="col-sm-6 col-md-3">
+                <label for="section" class="form-label small fw-bold text-muted">Section / Wing</label>
+                <select name="section" id="section" class="form-select form-select-sm">
+                    <option value="">All Sections</option>
+                    {% for sec in sections %}
+                        <option value="{{ sec }}" {% if selected_section == sec %}selected{% endif %}>{{ sec }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-sm-6 col-md-3">
+                <label for="floor" class="form-label small fw-bold text-muted">Floor Level</label>
+                <select name="floor" id="floor" class="form-select form-select-sm">
+                    <option value="">All Floors</option>
+                    {% for fl in floors %}
+                        <option value="{{ fl }}" {% if selected_floor == fl %}selected{% endif %}>{{ fl }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-sm-6 col-md-2">
+                <label for="vehicle_type" class="form-label small fw-bold text-muted">Vehicle Type</label>
+                <select name="vehicle_type" id="vehicle_type" class="form-select form-select-sm">
+                    <option value="">All Types</option>
+                    {% for vt in vehicle_types %}
+                        <option value="{{ vt }}" {% if selected_type == vt %}selected{% endif %}>{{ vt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-sm-6 col-md-2">
+                <label for="status" class="form-label small fw-bold text-muted">Status</label>
+                <select name="status" id="status" class="form-select form-select-sm">
+                    <option value="">All Statuses</option>
+                    <option value="available" {% if selected_status == 'available' %}selected{% endif %}>Available</option>
+                    <option value="occupied" {% if selected_status == 'occupied' %}selected{% endif %}>Occupied</option>
+                    <option value="maintenance" {% if selected_status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary-sp btn-sm w-100 justify-content-center">
+                    <i class="bi bi-funnel-fill me-1"></i> Filter
+                </button>
+                <a href="{{ url_for('booking.parking') }}" class="btn btn-outline-secondary btn-sm" title="Reset Filters">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Parking Slots Grid -->
+    {% if slots %}
+        <div class="slots-grid mb-5">
+            {% for slot in slots %}
+                <div class="slot-card status-{{ slot.status }}">
+                    <div class="slot-header">
+                        <span class="slot-code">{{ slot.slot_number }}</span>
+                        <span class="slot-badge badge-{{ slot.status }}">
+                            {% if slot.status == 'available' %}
+                                🟢 Available
+                            {% elif slot.status == 'occupied' %}
+                                🔴 Occupied
+                            {% else %}
+                                🟡 Maintenance
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="slot-meta">
+                        <div class="slot-meta-item">
+                            <i class="bi bi-geo-alt text-muted"></i>
+                            <span class="text-truncate">{{ slot.section }}</span>
+                        </div>
+                        <div class="slot-meta-item">
+                            <i class="bi bi-layers text-muted"></i>
+                            <span>{{ slot.floor }}</span>
+                        </div>
+                        <div class="slot-meta-item">
+                            {% if slot.vehicle_type == 'Bike' %}
+                                <i class="bi bi-bicycle text-muted"></i>
+                            {% elif slot.vehicle_type == 'Scooter' %}
+                                <i class="bi bi-scooter text-muted"></i>
+                            {% else %}
+                                <i class="bi bi-car-front text-muted"></i>
+                            {% endif %}
+                            <span>{{ slot.vehicle_type }} Bay</span>
+                        </div>
+                    </div>
+
+                    <div class="slot-action mt-auto">
+                        {% if slot.status == 'available' %}
+                            {% if session.get('user_id') %}
+                                <button type="button" class="btn btn-success btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-1"
+                                        onclick="openBookingModal('{{ slot.id }}', '{{ slot.slot_number }}', '{{ slot.section }}', '{{ slot.floor }}', '{{ slot.vehicle_type }}')">
+                                    <i class="bi bi-check2-circle"></i> Book Now
+                                </button>
+                            {% else %}
+                                <a href="{{ url_for('auth.login', next=url_for('booking.parking')) }}" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login to Book
+                                </a>
+                            {% endif %}
+                        {% elif slot.status == 'occupied' %}
+                            <button class="btn btn-outline-danger btn-sm w-100 disabled" disabled>
+                                <i class="bi bi-slash-circle me-1"></i> Occupied
+                            </button>
+                        {% else %}
+                            <button class="btn btn-outline-warning text-dark btn-sm w-100 disabled" disabled>
+                                <i class="bi bi-tools me-1"></i> In Maintenance
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-grid"></i>
+            </div>
+            <h4>No Parking Slots Match Your Criteria</h4>
+            <p class="text-secondary small mb-3">Try adjusting your filters or clearing section/status parameters.</p>
+            <a href="{{ url_for('booking.parking') }}" class="btn btn-primary-sp btn-sm">Reset All Filters</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Dynamic Slot Booking Modal -->
+<div class="modal fade" id="bookSlotModal" tabindex="-1" aria-labelledby="bookSlotModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-light border-bottom">
+                <h5 class="modal-title fw-bold" id="bookSlotModalLabel">
+                    <i class="bi bi-p-square-fill text-primary me-2"></i>Book Slot <span id="modalSlotNumber" class="text-primary"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form id="slotBookingForm" method="POST" action="{{ url_for('booking.create_booking') }}">
+                <input type="hidden" name="slot_id" id="modalSlotId" value="">
+                
+                <div class="modal-body p-4">
+                    <div class="alert alert-info py-2 px-3 small mb-3">
+                        <span id="modalSlotDetails" class="fw-semibold"></span>
+                    </div>
+
+                    <!-- Vehicle Selection -->
+                    <div class="mb-3">
+                        <label for="modalVehicle" class="form-label small fw-bold">Select Your Vehicle <span class="text-danger">*</span></label>
+                        {% if user_vehicles %}
+                            <select name="vehicle_id" id="modalVehicle" class="form-select" required>
+                                <option value="" disabled selected>-- Choose registered vehicle --</option>
+                                {% for v in user_vehicles %}
+                                    <option value="{{ v.id }}">{{ v.vehicle_number }} ({{ v.vehicle_type }} - {{ v.vehicle_model }})</option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            <div class="bg-light p-3 rounded-3 border text-center">
+                                <p class="small text-danger mb-2"><i class="bi bi-exclamation-circle me-1"></i>You don't have any registered vehicles.</p>
+                                <a href="{{ url_for('user.vehicles') }}" class="btn btn-primary-sp btn-sm">
+                                    <i class="bi bi-plus-lg me-1"></i> Add Vehicle First
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Booking Date -->
+                    <div class="mb-3">
+                        <label for="modalBookingDate" class="form-label small fw-bold">Booking Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="modalBookingDate" name="booking_date" 
+                               min="{{ today }}" value="{{ today }}" required>
+                    </div>
+
+                    <!-- Time Range -->
+                    <div class="row g-3 mb-2">
+                        <div class="col-6">
+                            <label for="modalStartTime" class="form-label small fw-bold">Start Time <span class="text-danger">*</span></label>
+                            <input type="time" class="form-control" id="modalStartTime" name="start_time" value="09:00" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="modalEndTime" class="form-label small fw-bold">End Time <span class="text-danger">*</span></label>
+                            <input type="time" class="form-control" id="modalEndTime" name="end_time" value="12:00" required>
+                        </div>
+                    </div>
+
+                    <div class="text-muted small">
+                        <i class="bi bi-info-circle me-1"></i>Overlapping bookings on the same slot are strictly prevented by the system.
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    {% if user_vehicles %}
+                        <button type="submit" class="btn btn-primary-sp">
+                            <i class="bi bi-calendar-check me-1"></i> Confirm & Book Slot
+                        </button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

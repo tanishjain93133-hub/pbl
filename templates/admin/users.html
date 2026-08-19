@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Registered Users — SmartPark Admin{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- Admin Sidebar Navigation -->
+    <aside class="app-sidebar bg-dark">
+        <div class="sidebar-title text-warning">Admin Console</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="bi bi-speedometer2"></i> <span>Admin Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.slots') }}">
+                    <i class="bi bi-p-square"></i> <span>Manage Slots</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.users') }}" class="active">
+                    <i class="bi bi-people"></i> <span>Campus Users</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.bookings') }}">
+                    <i class="bi bi-receipt"></i> <span>All Bookings</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.history') }}">
+                    <i class="bi bi-clock-history"></i> <span>Campus History</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="app-main">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <h2 class="mb-1">Registered Campus Users</h2>
+                <p class="text-secondary small mb-0">List of student and staff accounts with vehicle and booking records.</p>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="sp-card mb-4">
+            <form method="GET" action="{{ url_for('admin.users') }}" class="row g-3 align-items-end">
+                <div class="col-md-9">
+                    <label for="userSearch" class="form-label small fw-bold text-muted">Search Users</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="userSearch" name="search" 
+                               value="{{ search or '' }}" placeholder="Search by user name, email, phone number...">
+                    </div>
+                </div>
+
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-sp btn-sm w-100 justify-content-center">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-outline-secondary btn-sm" title="Reset">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        {% if users %}
+            <div class="sp-card p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="sp-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>User Name</th>
+                                <th>Email Address</th>
+                                <th>Contact Phone</th>
+                                <th>Registered Vehicles</th>
+                                <th>Total Bookings</th>
+                                <th>Registration Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                                <tr>
+                                    <td><span class="fw-bold text-primary">#UID-{{ u.id }}</span></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width:30px; height:30px; font-size:0.8rem;">
+                                                {{ u.name[0] | upper }}
+                                            </div>
+                                            <span class="fw-bold text-dark">{{ u.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ u.email }}</td>
+                                    <td>{{ u.phone }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="bi bi-car-front me-1"></i>{{ u.vehicle_count }} vehicles
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="bi bi-calendar-check me-1"></i>{{ u.booking_count }} bookings
+                                        </span>
+                                    </td>
+                                    <td><span class="text-muted small">{{ u.created_at }}</span></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <h4>No Users Found</h4>
+                <p class="text-secondary small mb-3">No campus accounts matched your search criteria.</p>
+                <a href="{{ url_for('admin.users') }}" class="btn btn-primary-sp btn-sm">Reset Search</a>
+            </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

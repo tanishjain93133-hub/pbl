@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}User Dashboard — SmartPark{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- User Sidebar Navigation -->
+    <aside class="app-sidebar">
+        <div class="sidebar-title">Main Menu</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.dashboard') }}" class="active">
+                    <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('booking.parking') }}">
+                    <i class="bi bi-grid-3x3-gap"></i> <span>Parking Slots</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('booking.my_bookings') }}">
+                    <i class="bi bi-calendar-check"></i> <span>My Bookings</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.vehicles') }}">
+                    <i class="bi bi-car-front"></i> <span>My Vehicles</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.history') }}">
+                    <i class="bi bi-clock-history"></i> <span>Vehicle History</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('user.profile') }}">
+                    <i class="bi bi-person-gear"></i> <span>My Profile</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-title mt-4">System</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{{ url_for('future_scope') }}">
+                    <i class="bi bi-rocket-takeoff"></i> <span>PBL-II Scope</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('auth.logout') }}" class="text-danger">
+                    <i class="bi bi-box-arrow-right text-danger"></i> <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <h2 class="mb-1">Hello, {{ session.get('user_name', 'Student') }} 👋</h2>
+                <p class="text-secondary small mb-0">Welcome to your campus parking overview and active reservations.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('booking.parking') }}" class="btn btn-primary-sp">
+                    <i class="bi bi-plus-circle me-1"></i> Book Parking Slot
+                </a>
+                <a href="{{ url_for('user.vehicles') }}" class="btn btn-outline-sp">
+                    <i class="bi bi-car-front me-1"></i> Add Vehicle
+                </a>
+            </div>
+        </div>
+
+        <!-- 4 Summary Metric Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-green">
+                        <i class="bi bi-p-square"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ available_slots_count }}</div>
+                        <div class="stat-label">Available Slots</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-blue">
+                        <i class="bi bi-calendar2-check"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{% if active_booking %}1{% else %}0{% endif %}</div>
+                        <div class="stat-label">Active Booking</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-purple">
+                        <i class="bi bi-receipt"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ total_bookings_count }}</div>
+                        <div class="stat-label">Total Bookings</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper icon-amber">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-number">{{ total_vehicles_count }}</div>
+                        <div class="stat-label">My Vehicles</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- Current / Active Booking Banner Card -->
+            <div class="col-lg-7">
+                <div class="sp-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-bookmark-star-fill text-primary me-2"></i>Current Parking Status</h5>
+                        {% if active_booking %}
+                            <span class="badge badge-status-{{ active_booking.booking_status }} px-3 py-2 text-uppercase fw-bold">
+                                {{ active_booking.booking_status }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    {% if active_booking %}
+                        <div class="bg-light rounded-3 p-3 border mb-3">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-sm-4 text-center border-end">
+                                    <div class="text-secondary small">Slot Reserved</div>
+                                    <div class="display-6 fw-extrabold text-primary">{{ active_booking.slot_number }}</div>
+                                    <div class="badge bg-secondary">{{ active_booking.floor }}</div>
+                                </div>
+                                <div class="col-sm-8 ps-sm-3">
+                                    <div class="row g-2 small">
+                                        <div class="col-6">
+                                            <span class="text-secondary">Vehicle:</span><br>
+                                            <strong class="text-dark">{{ active_booking.vehicle_number }}</strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="text-secondary">Type:</span><br>
+                                            <strong class="text-dark">{{ active_booking.vehicle_type }}</strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="text-secondary">Date:</span><br>
+                                            <strong class="text-dark">{{ active_booking.booking_date }}</strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="text-secondary">Time Slot:</span><br>
+                                            <strong class="text-dark">{{ active_booking.start_time }} – {{ active_booking.end_time }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('booking.confirmation', booking_id=active_booking.id) }}" class="btn btn-outline-sp btn-sm">
+                                <i class="bi bi-receipt me-1"></i> View Digital Receipt
+                            </a>
+                            <form method="POST" action="{{ url_for('booking.cancel_booking', booking_id=active_booking.id) }}" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-x-circle me-1"></i> Cancel Booking
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="empty-state p-4">
+                            <div class="empty-icon" style="width:50px; height:50px; font-size:1.4rem;">
+                                <i class="bi bi-p-circle"></i>
+                            </div>
+                            <h6 class="fw-bold">No Active Reservations</h6>
+                            <p class="text-secondary small mb-3">You currently do not have any active or upcoming parking bookings.</p>
+                            <a href="{{ url_for('booking.parking') }}" class="btn btn-primary-sp btn-sm">
+                                <i class="bi bi-search me-1"></i> Find Available Slot
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Registered Vehicles Panel -->
+            <div class="col-lg-5">
+                <div class="sp-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-car-front-fill text-primary me-2"></i>My Vehicles</h5>
+                        <a href="{{ url_for('user.vehicles') }}" class="small text-primary fw-bold text-decoration-none">Manage All</a>
+                    </div>
+
+                    {% if user_vehicles %}
+                        <div class="d-flex flex-column gap-2 mb-3">
+                            {% for v in user_vehicles[:3] %}
+                                <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-light border">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-white p-2 rounded-2 border text-primary">
+                                            {% if v.vehicle_type == 'Bike' %}
+                                                <i class="bi bi-bicycle"></i>
+                                            {% elif v.vehicle_type == 'Scooter' %}
+                                                <i class="bi bi-scooter"></i>
+                                            {% else %}
+                                                <i class="bi bi-car-front"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold small">{{ v.vehicle_number }}</div>
+                                            <div class="text-muted" style="font-size:0.75rem;">{{ v.vehicle_type }} • {{ v.vehicle_model }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-white text-secondary border">Verified</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state p-3">
+                            <div class="empty-icon" style="width:45px; height:45px; font-size:1.2rem;">
+                                <i class="bi bi-car-front"></i>
+                            </div>
+                            <h6 class="fw-bold mb-1">No Vehicle Registered</h6>
+                            <p class="text-secondary small mb-2">Register your vehicle to start booking slots.</p>
+                            <a href="{{ url_for('user.vehicles') }}" class="btn btn-primary-sp btn-sm">Add Vehicle</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Bookings Table -->
+        <div class="sp-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history text-primary me-2"></i>Recent Bookings</h5>
+                <a href="{{ url_for('booking.my_bookings') }}" class="small text-primary fw-bold text-decoration-none">View All Bookings</a>
+            </div>
+
+            {% if recent_bookings %}
+                <div class="table-responsive">
+                    <table class="sp-table">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Slot</th>
+                                <th>Vehicle</th>
+                                <th>Date</th>
+                                <th>Time Window</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in recent_bookings %}
+                                <tr>
+                                    <td><span class="fw-bold text-primary">#{{ b.id }}</span></td>
+                                    <td><strong>{{ b.slot_number }}</strong> <span class="text-muted small">({{ b.section }})</span></td>
+                                    <td><span class="badge bg-light text-dark border">{{ b.vehicle_number }}</span></td>
+                                    <td>{{ b.booking_date }}</td>
+                                    <td>{{ b.start_time }} – {{ b.end_time }}</td>
+                                    <td>
+                                        <span class="badge badge-status-{{ b.booking_status }} px-2 py-1 text-uppercase fw-semibold" style="font-size:0.75rem;">
+                                            {{ b.booking_status }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{{ url_for('booking.confirmation', booking_id=b.id) }}" class="btn btn-outline-sp btn-sm py-1 px-2">
+                                            <i class="bi bi-eye"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state p-4">
+                    <p class="text-secondary small mb-0">No past bookings found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

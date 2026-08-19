@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}PBL-II / Future Scope — SmartPark{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center max-w-700 mx-auto mb-5">
+        <span class="badge bg-primary px-3 py-2 text-uppercase mb-2">PBL-II Roadmap</span>
+        <h1 class="display-6 fw-bold">Future Scope & Innovations</h1>
+        <p class="text-secondary">
+            The following cutting-edge smart-campus features are planned for <strong>PBL-II</strong>. In accordance with the PBL-I scope, these modules are currently architectural concepts and will be implemented in subsequent phases.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Feature 1 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="sp-card h-100 position-relative">
+                <span class="badge bg-secondary position-absolute top-0 end-0 m-3">Coming Soon • PBL-II</span>
+                <div class="stat-icon-wrapper icon-blue mb-3">
+                    <i class="bi bi-camera-video-fill"></i>
+                </div>
+                <h5 class="fw-bold">Automatic Number Plate Recognition (ANPR)</h5>
+                <p class="text-secondary small">
+                    AI-powered computer vision cameras at campus entry/exit points to automatically scan license plates, match them with active bookings, and authorize vehicle passage.
+                </p>
+                <div class="d-flex align-items-center gap-2 text-muted small pt-2 border-top">
+                    <i class="bi bi-cpu"></i> <span>OpenCV & Deep Learning</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="sp-card h-100 position-relative">
+                <span class="badge bg-secondary position-absolute top-0 end-0 m-3">Coming Soon • PBL-II</span>
+                <div class="stat-icon-wrapper icon-green mb-3">
+                    <i class="bi bi-broadcast-pin"></i>
+                </div>
+                <h5 class="fw-bold">IoT Ultrasonic & IR Sensors</h5>
+                <p class="text-secondary small">
+                    Microcontroller-connected ultrasonic/infrared sensors deployed above physical parking bays (ESP32/Arduino) sending telemetry directly to the cloud for millisecond occupancy detection.
+                </p>
+                <div class="d-flex align-items-center gap-2 text-muted small pt-2 border-top">
+                    <i class="bi bi-hdd-network"></i> <span>ESP32 & MQTT Protocol</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="sp-card h-100 position-relative">
+                <span class="badge bg-secondary position-absolute top-0 end-0 m-3">Coming Soon • PBL-II</span>
+                <div class="stat-icon-wrapper icon-purple mb-3">
+                    <i class="bi bi-map-fill"></i>
+                </div>
+                <h5 class="fw-bold">Interactive Live Campus Map</h5>
+                <p class="text-secondary small">
+                    Vector-based 2D/3D indoor campus layout maps providing turn-by-turn routing guidance for drivers from campus gates directly to their booked slot.
+                </p>
+                <div class="d-flex align-items-center gap-2 text-muted small pt-2 border-top">
+                    <i class="bi bi-geo-alt"></i> <span>Leaflet / Mapbox & WebGL</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="sp-card h-100 position-relative">
+                <span class="badge bg-secondary position-absolute top-0 end-0 m-3">Coming Soon • PBL-II</span>
+                <div class="stat-icon-wrapper icon-amber mb-3">
+                    <i class="bi bi-credit-card-2-front-fill"></i>
+                </div>
+                <h5 class="fw-bold">Online Payment Gateways & Fastag</h5>
+                <p class="text-secondary small">
+                    Integration with UPI, cards, net banking, and campus RFID wallet systems for seamless cashless parking fee collection and automated receipts.
+                </p>
+                <div class="d-flex align-items-center gap-2 text-muted small pt-2 border-top">
+                    <i class="bi bi-shield-check"></i> <span>Razorpay / Stripe Webhooks</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="sp-card h-100 position-relative">
+                <span class="badge bg-secondary position-absolute top-0 end-0 m-3">Coming Soon • PBL-II</span>
+                <div class="stat-icon-wrapper icon-red mb-3">
+                    <i class="bi bi-door-open-fill"></i>
+                </div>
+                <h5 class="fw-bold">Automatic Barrier Gates</h5>
+                <p class="text-secondary small">
+                    Hardware-actuated servo boom barriers synced with cloud verification endpoints to lift gates automatically upon license verification.
+                </p>
+                <div class="d-flex align-items-center gap-2 text-muted small pt-2 border-top">
+                    <i class="bi bi-gear-wide-connected"></i> <span>Relay Controls & Edge Nodes</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="col-md-6 col-lg-4">
+            <div class="sp-card h-100 position-relative">
+                <span class="badge bg-secondary position-absolute top-0 end-0 m-3">Coming Soon • PBL-II</span>
+                <div class="stat-icon-wrapper icon-blue mb-3">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <h5 class="fw-bold">AI Predictive Parking Analytics</h5>
+                <p class="text-secondary small">
+                    Machine learning forecasting models predicting peak campus parking demand during exams, fests, and faculty events to optimize slot distribution.
+                </p>
+                <div class="d-flex align-items-center gap-2 text-muted small pt-2 border-top">
+                    <i class="bi bi-lightbulb"></i> <span>Time-series Forecasting</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{{ url_for('booking.parking') }}" class="btn btn-primary-sp px-4 py-2">
+            <i class="bi bi-arrow-left me-1"></i> Return to PBL-I Parking System
+        </a>
+    </div>
+</div>
+{% endblock %}

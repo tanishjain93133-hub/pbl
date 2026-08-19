@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}403 Forbidden — SmartPark{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="py-5">
+        <div class="stat-icon-wrapper icon-red mx-auto mb-4" style="width:80px; height:80px; font-size:2.5rem;">
+            <i class="bi bi-shield-slash-fill"></i>
+        </div>
+        <h1 class="display-5 fw-extrabold text-danger">403 Access Denied</h1>
+        <p class="text-secondary max-w-500 mx-auto mb-4">
+            You do not have administrative permission to view or modify this campus resource.
+        </p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary-sp px-4 py-2">
+            <i class="bi bi-house-door me-1"></i> Return Home
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Book Parking Slot — SmartPark{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="sp-card shadow-md p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="logo-badge mx-auto mb-3" style="width:48px; height:48px; font-size:1.5rem;">
+                        <i class="bi bi-calendar2-check-fill"></i>
+                    </div>
+                    <h3 class="fw-bold">Reserve Parking Slot</h3>
+                    <p class="text-secondary small">Select your vehicle, date, and parking hours</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('booking.create_booking') }}" id="slotBookingForm">
+                    <!-- Slot Selection -->
+                    <div class="mb-3">
+                        <label for="slot_id" class="form-label fw-semibold small">Select Slot <span class="text-danger">*</span></label>
+                        <select name="slot_id" id="slot_id" class="form-select" required>
+                            {% if selected_slot %}
+                                <option value="{{ selected_slot.id }}" selected>{{ selected_slot.slot_number }} — {{ selected_slot.section }} ({{ selected_slot.floor }})</option>
+                            {% else %}
+                                <option value="" disabled selected>-- Choose available slot --</option>
+                                {% for s in available_slots %}
+                                    <option value="{{ s.id }}">{{ s.slot_number }} — {{ s.section }} ({{ s.floor }} • {{ s.vehicle_type }})</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <!-- Vehicle Selection -->
+                    <div class="mb-3">
+                        <label for="vehicle_id" class="form-label fw-semibold small">Select Vehicle <span class="text-danger">*</span></label>
+                        {% if user_vehicles %}
+                            <select name="vehicle_id" id="vehicle_id" class="form-select" required>
+                                <option value="" disabled selected>-- Choose registered vehicle --</option>
+                                {% for v in user_vehicles %}
+                                    <option value="{{ v.id }}">{{ v.vehicle_number }} ({{ v.vehicle_type }} - {{ v.vehicle_model }})</option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            <div class="alert alert-warning small d-flex align-items-center justify-content-between">
+                                <span>No registered vehicles found.</span>
+                                <a href="{{ url_for('user.vehicles') }}" class="btn btn-sm btn-dark">Add Vehicle</a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Booking Date -->
+                    <div class="mb-3">
+                        <label for="modalBookingDate" class="form-label fw-semibold small">Booking Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="modalBookingDate" name="booking_date" 
+                               min="{{ today }}" value="{{ today }}" required>
+                    </div>
+
+                    <!-- Start & End Time -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label for="modalStartTime" class="form-label fw-semibold small">Start Time <span class="text-danger">*</span></label>
+                            <input type="time" class="form-control" id="modalStartTime" name="start_time" value="09:00" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="modalEndTime" class="form-label fw-semibold small">End Time <span class="text-danger">*</span></label>
+                            <input type="time" class="form-control" id="modalEndTime" name="end_time" value="12:00" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary-sp py-2 justify-content-center" {% if not user_vehicles %}disabled{% endif %}>
+                            <i class="bi bi-check2-circle me-1"></i> Confirm & Book Slot
+                        </button>
+                        <a href="{{ url_for('booking.parking') }}" class="btn btn-outline-sp justify-content-center">
+                            Back to Parking Overview
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

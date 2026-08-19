@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Portal Login — SmartPark{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="sp-card shadow-lg p-4 p-md-5 border-top border-4 border-warning">
+                <div class="text-center mb-4">
+                    <div class="stat-icon-wrapper icon-amber mx-auto mb-3" style="width:54px; height:54px; font-size:1.6rem;">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <h3 class="fw-bold">Admin Portal</h3>
+                    <p class="text-secondary small">Restricted administrative access for campus parking operations</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.admin_login') }}">
+                    <div class="mb-3">
+                        <label for="adminEmail" class="form-label fw-semibold small">Admin Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-shield-check text-muted"></i></span>
+                            <input type="email" class="form-control border-start-0 ps-0" id="adminEmail" name="email" 
+                                   value="{{ email or '' }}" placeholder="admin@smartpark.com" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="adminPassword" class="form-label fw-semibold small">Admin Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
+                            <input type="password" class="form-control border-start-0 border-end-0 ps-0" id="adminPassword" name="password" 
+                                   placeholder="Enter admin password" required>
+                            <button type="button" class="btn bg-light border border-start-0" onclick="togglePassword('adminPassword', 'toggleAdminEye')">
+                                <i class="bi bi-eye text-muted" id="toggleAdminEye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 py-2 fw-bold justify-content-center mb-3">
+                        <i class="bi bi-shield-shaded me-1"></i> Authenticate as Admin
+                    </button>
+
+                    <div class="text-center small text-secondary">
+                        <a href="{{ url_for('auth.login') }}" class="text-secondary text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> Return to Regular User Login
+                        </a>
+                    </div>
+                </form>
+
+                <div class="mt-4 pt-3 border-top text-center">
+                    <small class="text-muted">Default Admin: <code>admin@smartpark.com</code> / <code>Admin@123</code></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

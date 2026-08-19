@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Bookings — SmartPark Admin{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <!-- Admin Sidebar Navigation -->
+    <aside class="app-sidebar bg-dark">
+        <div class="sidebar-title text-warning">Admin Console</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="bi bi-speedometer2"></i> <span>Admin Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.slots') }}">
+                    <i class="bi bi-p-square"></i> <span>Manage Slots</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.users') }}">
+                    <i class="bi bi-people"></i> <span>Campus Users</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.bookings') }}" class="active">
+                    <i class="bi bi-receipt"></i> <span>All Bookings</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ url_for('admin.history') }}">
+                    <i class="bi bi-clock-history"></i> <span>Campus History</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="app-main">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <h2 class="mb-1">All Campus Parking Bookings</h2>
+                <p class="text-secondary small mb-0">Monitor active reservations, verify vehicle check-ins, and override booking statuses.</p>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="sp-card mb-4">
+            <form method="GET" action="{{ url_for('admin.bookings') }}" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="bookingSearch" class="form-label small fw-bold text-muted">Search Records</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="bookingSearch" name="search" 
+                               value="{{ search or '' }}" placeholder="Search by user, vehicle, slot...">
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-md-3">
+                    <label for="adminBookingStatus" class="form-label small fw-bold text-muted">Booking Status</label>
+                    <select name="status" id="adminBookingStatus" class="form-select form-select-sm">
+                        <option value="">All Statuses</option>
+                        <option value="booked" {% if selected_status == 'booked' %}selected{% endif %}>Booked (Scheduled)</option>
+                        <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active (Parked)</option>
+                        <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="col-sm-6 col-md-3">
+                    <label for="adminBookingDate" class="form-label small fw-bold text-muted">Filter by Date</label>
+                    <input type="date" class="form-control form-control-sm" id="adminBookingDate" name="date" 
+                           value="{{ selected_date or '' }}">
+                </div>
+
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-sp btn-sm w-100 justify-content-center">
+                        Filter
+                    </button>
+                    <a href="{{ url_for('admin.bookings') }}" class="btn btn-outline-secondary btn-sm" title="Reset">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        {% if bookings %}
+            <div class="sp-card p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="sp-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Booking Ref</th>
+                                <th>Student / User</th>
+                                <th>Vehicle Plate</th>
+                                <th>Reserved Slot</th>
+                                <th>Booking Date</th>
+                                <th>Time Interval</th>
+                                <th>Status</th>
+                                <th class="text-end">Change Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in bookings %}
+                                <tr>
+                                    <td><span class="fw-bold text-primary">#SP-{{ b.id }}</span></td>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ b.user_name }}</div>
+                                        <div class="text-muted small">{{ b.user_email }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">{{ b.vehicle_number }}</span>
+                                        <div class="text-muted small">{{ b.vehicle_type }}</div>
+                                    </td>
+                                    <td>
+                                        <strong class="text-primary">{{ b.slot_number }}</strong>
+                                        <div class="text-muted small">{{ b.section }} ({{ b.floor }})</div>
+                                    </td>
+                                    <td>{{ b.booking_date }}</td>
+                                    <td>{{ b.start_time }} – {{ b.end_time }}</td>
+                                    <td>
+                                        <span class="badge badge-status-{{ b.booking_status }} px-2 py-1 text-uppercase fw-semibold" style="font-size:0.75rem;">
+                                            {{ b.booking_status }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown">
+                                                Update Status
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                                <li>
+                                                    <form method="POST" action="{{ url_for('admin.update_booking_status', booking_id=b.id) }}">
+                                                        <input type="hidden" name="status" value="active">
+                                                        <button type="submit" class="dropdown-item py-2 text-success"><i class="bi bi-play-circle me-2"></i>Mark Active (Parked)</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form method="POST" action="{{ url_for('admin.update_booking_status', booking_id=b.id) }}">
+                                                        <input type="hidden" name="status" value="completed">
+                                                        <button type="submit" class="dropdown-item py-2 text-secondary"><i class="bi bi-check2-circle me-2"></i>Mark Completed (Exited)</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form method="POST" action="{{ url_for('admin.update_booking_status', booking_id=b.id) }}">
+                                                        <input type="hidden" name="status" value="cancelled">
+                                                        <button type="submit" class="dropdown-item py-2 text-danger"><i class="bi bi-x-circle me-2"></i>Cancel Booking</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form method="POST" action="{{ url_for('admin.update_booking_status', booking_id=b.id) }}">
+                                                        <input type="hidden" name="status" value="booked">
+                                                        <button type="submit" class="dropdown-item py-2 text-primary"><i class="bi bi-calendar-event me-2"></i>Reset to Booked</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <h4>No Bookings Found</h4>
+                <p class="text-secondary small mb-3">No reservations matched the chosen filter parameters.</p>
+                <a href="{{ url_for('admin.bookings') }}" class="btn btn-primary-sp btn-sm">Reset Filter</a>
+            </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

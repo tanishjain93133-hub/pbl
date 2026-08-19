@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Confirmed — SmartPark{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="sp-card shadow-lg p-0 overflow-hidden border-0">
+                <!-- Confirmation Header Banner -->
+                <div class="bg-success text-white text-center p-4">
+                    <div class="stat-icon-wrapper bg-white text-success mx-auto mb-2" style="width:60px; height:60px; font-size:2rem;">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">Booking Confirmed!</h3>
+                    <p class="mb-0 text-white-50 small">Your parking space has been successfully reserved.</p>
+                </div>
+
+                <!-- Digital Receipt Slip Body -->
+                <div class="p-4 p-md-5 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <span class="text-muted small">Booking Reference</span>
+                            <div class="fw-extrabold fs-4 text-primary">#SP-{{ booking.id }}</div>
+                        </div>
+                        <span class="badge badge-status-{{ booking.booking_status }} px-3 py-2 text-uppercase fw-bold">
+                            {{ booking.booking_status }}
+                        </span>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <span class="text-secondary small">Parking Slot:</span>
+                            <div class="fw-bold fs-5 text-dark">{{ booking.slot_number }}</div>
+                            <span class="text-muted small">{{ booking.section }} ({{ booking.floor }})</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-secondary small">Registered Vehicle:</span>
+                            <div class="fw-bold fs-5 text-dark">{{ booking.vehicle_number }}</div>
+                            <span class="text-muted small">{{ booking.vehicle_type }} • {{ booking.vehicle_model }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-secondary small">Booking Date:</span>
+                            <div class="fw-bold text-dark">{{ booking.booking_date }}</div>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-secondary small">Reserved Time Window:</span>
+                            <div class="fw-bold text-dark">{{ booking.start_time }} – {{ booking.end_time }}</div>
+                        </div>
+                        <div class="col-12">
+                            <span class="text-secondary small">Booked Under:</span>
+                            <div class="fw-semibold text-dark">{{ booking.user_name }} ({{ booking.user_email }})</div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-light border small text-muted mb-4 d-flex align-items-center gap-2">
+                        <i class="bi bi-info-circle-fill text-primary fs-5"></i>
+                        <div>
+                            Please arrive on campus during your allocated time window. Present this digital confirmation if requested by campus security.
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-2">
+                        <a href="{{ url_for('booking.my_bookings') }}" class="btn btn-primary-sp flex-grow-1 justify-content-center">
+                            <i class="bi bi-receipt me-1"></i> View My Bookings
+                        </a>
+                        <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-sp justify-content-center">
+                            <i class="bi bi-speedometer2 me-1"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
