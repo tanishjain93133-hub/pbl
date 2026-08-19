@@ -44,19 +44,29 @@ def get_sqlite_connection():
     db_path = Config.SQLITE_DB_PATH
     dir_name = os.path.dirname(db_path)
     if dir_name:
-        os.makedirs(dir_name, exist_ok=True)
+        try:
+            os.makedirs(dir_name, exist_ok=True)
+        except Exception:
+            pass
     
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     # Enable foreign keys in SQLite
-    conn.execute("PRAGMA foreign_keys = ON")
+    try:
+        conn.execute("PRAGMA foreign_keys = ON")
+    except Exception:
+        pass
     
     # Auto-initialize schema and seed data if database is empty
-    cursor = conn.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
-    if not cursor.fetchone():
-        _auto_seed_sqlite(conn)
-    cursor.close()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+        table = cursor.fetchone()
+        cursor.close()
+        if not table:
+            _auto_seed_sqlite(conn)
+    except Exception as e:
+        print(f"[SmartPark DB Table Check Notice]: {e}")
     
     return conn
 
