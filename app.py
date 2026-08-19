@@ -28,6 +28,8 @@ def create_app():
 
     # Public Landing Page
     @app.route('/')
+    @app.route('/api/index')
+    @app.route('/api')
     def index():
         # Live overview stats for landing page hero
         stats = {
