@@ -11,9 +11,10 @@ class Config:
     IS_VERCEL = bool(os.getenv('VERCEL') or os.getenv('AWS_LAMBDA_FUNCTION_NAME'))
     
     # DB configuration
-    # Default to sqlite if running on Vercel / serverless and no explicit remote MySQL host is provided
-    default_db_type = 'sqlite' if (IS_VERCEL and (not os.getenv('MYSQL_HOST') or os.getenv('MYSQL_HOST') == 'localhost')) else 'mysql'
-    DB_TYPE = os.getenv('DB_TYPE', default_db_type).lower()
+    if IS_VERCEL and (not os.getenv('MYSQL_HOST') or os.getenv('MYSQL_HOST') == 'localhost'):
+        DB_TYPE = 'sqlite'
+    else:
+        DB_TYPE = os.getenv('DB_TYPE', 'mysql').lower()
     
     MYSQL_HOST = os.getenv('MYSQL_HOST', 'localhost')
     MYSQL_PORT = int(os.getenv('MYSQL_PORT', 3306))

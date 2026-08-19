@@ -7,3 +7,6 @@ if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
 from app import app
+
+# Expose handler for universal Vercel Python runtime compatibility
+handler = app
