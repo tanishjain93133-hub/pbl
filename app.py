@@ -39,6 +39,12 @@ def create_app():
             return send_from_directory(app.static_folder, filename)
         return "Asset not found", 404
 
+    @app.route('/debug-env')
+    def debug_env():
+        from flask import request
+        return {k: str(v) for k, v in request.environ.items() if not k.startswith('wsgi.')}
+
+
 
     # Register DB teardown
     app.teardown_appcontext(close_db)
