@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, session, redirect, url_for
+from flask import Flask, render_template, session, redirect, url_for, send_from_directory
 from config import Config
 from database.db import close_db, query_db
 
@@ -24,10 +24,21 @@ def create_app():
     app = Flask(
         __name__,
         template_folder=template_dir,
-        static_folder=static_dir
+        static_folder=static_dir,
+        static_url_path='/static'
     )
     app.url_map.strict_slashes = False
     app.config.from_object(Config)
+
+    @app.route('/static/<path:filename>')
+    def serve_custom_static(filename):
+        for s_dir in static_candidates:
+            if s_dir and os.path.exists(os.path.join(s_dir, filename)):
+                return send_from_directory(s_dir, filename)
+        if app.static_folder and os.path.exists(os.path.join(app.static_folder, filename)):
+            return send_from_directory(app.static_folder, filename)
+        return "Asset not found", 404
+
 
     # Register DB teardown
     app.teardown_appcontext(close_db)
