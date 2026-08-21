@@ -1,7 +1,56 @@
 import os
-from flask import Flask, render_template, session, redirect, url_for, send_from_directory
+import sys
+from urllib.parse import unquote, urlparse, parse_qs, urlencode
+from flask import Flask, render_template, session, redirect, url_for, send_from_directory, request
 from config import Config
 from database.db import close_db, query_db
+
+class VercelPathFixMiddleware:
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        query_string = environ.get('QUERY_STRING', '')
+        resolved_path = None
+
+        if '__vercel_path=' in query_string:
+            qs_dict = parse_qs(query_string, keep_blank_values=True)
+            if '__vercel_path' in qs_dict:
+                val = qs_dict.pop('__vercel_path')[0]
+                if val:
+                    val = unquote(val)
+                    resolved_path = val if val.startswith('/') else '/' + val
+                else:
+                    resolved_path = '/'
+                environ['QUERY_STRING'] = urlencode(qs_dict, doseq=True)
+
+        if not resolved_path:
+            raw_uri = (
+                environ.get('RAW_URI') or
+                environ.get('REQUEST_URI') or
+                environ.get('HTTP_X_FORWARDED_URI') or
+                environ.get('HTTP_X_VERCEL_PATH') or
+                ''
+            )
+            if raw_uri:
+                resolved_path = urlparse(raw_uri).path
+            else:
+                resolved_path = environ.get('PATH_INFO', '')
+
+        resolved_path = unquote(resolved_path or '/')
+
+        if resolved_path.startswith('/api/index.py'):
+            resolved_path = resolved_path[len('/api/index.py'):]
+        elif resolved_path.startswith('/api/index'):
+            resolved_path = resolved_path[len('/api/index'):]
+        elif resolved_path.startswith('/api'):
+            resolved_path = resolved_path[len('/api'):]
+
+        if not resolved_path:
+            resolved_path = '/'
+
+        environ['PATH_INFO'] = resolved_path
+        return self.wsgi_app(environ, start_response)
 
 def create_app():
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -29,6 +78,7 @@ def create_app():
     )
     app.url_map.strict_slashes = False
     app.config.from_object(Config)
+    app.wsgi_app = VercelPathFixMiddleware(app.wsgi_app)
 
     @app.route('/static/<path:filename>')
     def serve_custom_static(filename):
@@ -55,12 +105,8 @@ def create_app():
 
     # Public Landing Page
     @app.route('/')
-    @app.route('/api/index')
-    @app.route('/api')
     def index():
-        from flask import request
-        if request.args.get('debug') == '1':
-            return {k: str(v) for k, v in request.environ.items() if not k.startswith('wsgi.')}
+
 
         # Live overview stats for landing page hero
         stats = {
