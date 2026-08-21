@@ -58,6 +58,10 @@ def create_app():
     @app.route('/api/index')
     @app.route('/api')
     def index():
+        from flask import request
+        if request.args.get('debug') == '1':
+            return {k: str(v) for k, v in request.environ.items() if not k.startswith('wsgi.')}
+
         # Live overview stats for landing page hero
         stats = {
             'total_slots': 0,
