@@ -1,6 +1,6 @@
 import os
 import sys
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote, urlparse, parse_qs, urlencode
 
 # Add root directory to sys.path
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -14,49 +14,54 @@ class VercelPathFixMiddleware:
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-        # Prefer original requested URI headers
-        raw_uri = (
-            environ.get('RAW_URI') or
-            environ.get('REQUEST_URI') or
-            environ.get('HTTP_X_FORWARDED_URI') or
-            environ.get('HTTP_X_VERCEL_PATH') or
-            ''
-        )
-        
-        if raw_uri:
-            parsed = urlparse(raw_uri)
-            path = parsed.path
-        else:
-            path = environ.get('PATH_INFO', '')
+        query_string = environ.get('QUERY_STRING', '')
+        resolved_path = None
 
-        path = unquote(path or '')
+        # 1. Check if __vercel_path is passed in query string from rewrite
+        if '__vercel_path=' in query_string:
+            qs_dict = parse_qs(query_string, keep_blank_values=True)
+            if '__vercel_path' in qs_dict:
+                val = qs_dict.pop('__vercel_path')[0]
+                if val:
+                    val = unquote(val)
+                    resolved_path = val if val.startswith('/') else '/' + val
+                else:
+                    resolved_path = '/'
+                # Clean up query string so Flask views receive original parameters
+                environ['QUERY_STRING'] = urlencode(qs_dict, doseq=True)
 
-        # Check regex match parameter from Vercel rewrite if path is pointing to entrypoint
-        if not path or path in ('/api/index', '/api/index.py', '/api', '/api/', '/'):
-            route_matches = environ.get('HTTP_X_NOW_ROUTE_MATCHES', '')
-            if route_matches:
-                for part in route_matches.split('&'):
-                    if part.startswith('1='):
-                        captured = unquote(part[2:])
-                        if captured:
-                            path = captured if captured.startswith('/') else '/' + captured
-                        break
+        # 2. Fallback to RAW_URI / REQUEST_URI / HTTP_X_FORWARDED_URI / PATH_INFO
+        if not resolved_path:
+            raw_uri = (
+                environ.get('RAW_URI') or
+                environ.get('REQUEST_URI') or
+                environ.get('HTTP_X_FORWARDED_URI') or
+                environ.get('HTTP_X_VERCEL_PATH') or
+                ''
+            )
+            if raw_uri:
+                resolved_path = urlparse(raw_uri).path
+            else:
+                resolved_path = environ.get('PATH_INFO', '')
 
-        # Normalize entrypoint prefixes
-        if path.startswith('/api/index.py'):
-            path = path[len('/api/index.py'):]
-        elif path.startswith('/api/index'):
-            path = path[len('/api/index'):]
-        elif path.startswith('/api'):
-            path = path[len('/api'):]
+        resolved_path = unquote(resolved_path or '/')
 
-        if not path:
-            path = '/'
+        # Normalize prefix
+        if resolved_path.startswith('/api/index.py'):
+            resolved_path = resolved_path[len('/api/index.py'):]
+        elif resolved_path.startswith('/api/index'):
+            resolved_path = resolved_path[len('/api/index'):]
+        elif resolved_path.startswith('/api'):
+            resolved_path = resolved_path[len('/api'):]
 
-        environ['PATH_INFO'] = path
+        if not resolved_path:
+            resolved_path = '/'
+
+        environ['PATH_INFO'] = resolved_path
         return self.wsgi_app(environ, start_response)
 
 app.wsgi_app = VercelPathFixMiddleware(app.wsgi_app)
 handler = app
+
 
 

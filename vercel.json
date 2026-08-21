@@ -1,13 +1,18 @@
 {
   "functions": {
     "api/index.py": {
-      "includeFiles": "templates/**,static/**,database/**"
+      "includeFiles": "templates/**,static/**,database/**,public/**"
     }
   },
   "rewrites": [
     {
+      "source": "/static/(.*)",
+      "destination": "/public/static/$1"
+    },
+    {
       "source": "/(.*)",
-      "destination": "/api/index"
+      "destination": "/api/index?__vercel_path=$1"
     }
   ]
 }
+
