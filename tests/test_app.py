@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 import unittest
 import os
 import sys
@@ -91,11 +92,13 @@ class SmartParkTestCase(unittest.TestCase):
     def test_parking_slot_booking_and_overlap_prevention(self):
         self.login_user()
 
+        test_booking_date = (date.today() + timedelta(days=2)).isoformat()
+
         # Slot 1 (A01) is available
         book_res = self.client.post('/booking/create', data={
             'slot_id': '1',
             'vehicle_id': '1',
-            'booking_date': '2026-10-15',
+            'booking_date': test_booking_date,
             'start_time': '10:00',
             'end_time': '12:00'
         }, follow_redirects=True)
@@ -106,12 +109,12 @@ class SmartParkTestCase(unittest.TestCase):
         overlap_res = self.client.post('/booking/create', data={
             'slot_id': '1',
             'vehicle_id': '1',
-            'booking_date': '2026-10-15',
+            'booking_date': test_booking_date,
             'start_time': '11:00',
             'end_time': '13:00'
         }, follow_redirects=True)
         self.assertEqual(overlap_res.status_code, 200)
-        self.assertIn(b'already booked on 2026-10-15', overlap_res.data)
+        self.assertIn(f'already booked on {test_booking_date}'.encode(), overlap_res.data)
 
     def test_admin_slot_management(self):
         self.login_admin()

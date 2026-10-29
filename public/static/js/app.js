@@ -110,3 +110,127 @@ function showCustomToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 300);
     }, 4500);
 }
+
+// ==========================================================================
+// 4. SmartPark — Car Entrance Starting Point Animation Controller
+// ==========================================================================
+
+let introTimeout1, introTimeout2, introTimeout3;
+
+function initCarIntroAnimation(force = false) {
+    const overlay = document.getElementById('carIntroOverlay');
+    if (!overlay) return;
+
+    const isHomePage = (window.location.pathname === '/' || window.location.pathname === '');
+    const hasPlayed = sessionStorage.getItem('smartpark_intro_played');
+
+    if (!force && (!isHomePage || hasPlayed)) {
+        overlay.style.display = 'none';
+        return;
+    }
+
+    // Clear previous timeouts if replayed
+    clearTimeout(introTimeout1);
+    clearTimeout(introTimeout2);
+    clearTimeout(introTimeout3);
+
+    // Prepare fresh visual state
+    overlay.style.display = 'flex';
+    overlay.classList.remove('intro-fade-out');
+
+    const car = document.getElementById('introCar');
+    const fill = document.getElementById('introProgressFill');
+    const statusBadge = document.getElementById('introHudStatus');
+    const gateArm = document.getElementById('introBarrierArm');
+    const gateLight = document.getElementById('introGateLight');
+    const scannerBeam = document.getElementById('introScannerBeam');
+
+    if (fill) fill.style.width = '0%';
+    if (gateArm) gateArm.classList.remove('open');
+    if (gateLight) gateLight.classList.remove('granted');
+    if (scannerBeam) scannerBeam.classList.remove('scanning');
+    
+    if (statusBadge) {
+        statusBadge.classList.remove('granted');
+        statusBadge.innerHTML = '<span class="spinner-grow spinner-grow-sm me-1 text-info"></span> DETECTING VEHICLE APPROACH...';
+    }
+
+    // Restart car drive animation
+    if (car) {
+        car.style.animation = 'none';
+        void car.offsetWidth; // trigger reflow
+        car.style.animation = 'carEnterDrive 2.6s cubic-bezier(0.2, 0.8, 0.25, 1) forwards';
+    }
+
+    // Fill progress gauge
+    setTimeout(() => {
+        if (fill) fill.style.width = '100%';
+    }, 60);
+
+    // Step 1: RFID & Laser Scanning vehicle license plate
+    introTimeout1 = setTimeout(() => {
+        if (scannerBeam) scannerBeam.classList.add('scanning');
+        if (statusBadge) {
+            statusBadge.innerHTML = '<i class="bi bi-upc-scan me-1 text-warning"></i> AI SCANNING: GJ-01-SP-2026...';
+        }
+    }, 750);
+
+    // Step 2: Access Granted & Boom barrier arm lifts up
+    introTimeout2 = setTimeout(() => {
+        if (scannerBeam) scannerBeam.classList.remove('scanning');
+        if (gateArm) gateArm.classList.add('open');
+        if (gateLight) gateLight.classList.add('granted');
+        if (statusBadge) {
+            statusBadge.classList.add('granted');
+            statusBadge.innerHTML = '<i class="bi bi-check-circle-fill me-1 text-success"></i> ACCESS GRANTED • BAY A-01 ALLOCATED';
+        }
+    }, 1500);
+
+    // Step 3: Smooth website open & blur fade out
+    introTimeout3 = setTimeout(() => {
+        closeCarIntroOverlay();
+    }, 2700);
+}
+
+function closeCarIntroOverlay() {
+    clearTimeout(introTimeout1);
+    clearTimeout(introTimeout2);
+    clearTimeout(introTimeout3);
+
+    const overlay = document.getElementById('carIntroOverlay');
+    if (!overlay) return;
+
+    overlay.classList.add('intro-fade-out');
+    sessionStorage.setItem('smartpark_intro_played', 'true');
+
+    setTimeout(() => {
+        overlay.style.display = 'none';
+    }, 850);
+}
+
+function replayCarIntro() {
+    initCarIntroAnimation(true);
+}
+
+// Bind initialization and keyboard skip
+document.addEventListener('DOMContentLoaded', function () {
+    initCarIntroAnimation(false);
+
+    const skipBtn = document.getElementById('introSkipBtn');
+    if (skipBtn) {
+        skipBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            closeCarIntroOverlay();
+        });
+    }
+
+    // ESC key skips intro instantly
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            const overlay = document.getElementById('carIntroOverlay');
+            if (overlay && overlay.style.display !== 'none' && !overlay.classList.contains('intro-fade-out')) {
+                closeCarIntroOverlay();
+            }
+        }
+    });
+});

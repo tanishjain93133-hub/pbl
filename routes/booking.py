@@ -159,10 +159,11 @@ def create_booking():
         VALUES (%s, %s, %s, %s, %s, %s, %s)
     """, (user_id, vehicle_id, slot_id, booking_date_str, start_time_str, end_time_str, initial_status))
 
-    # 7. Update Slot status if active
+    # 7. Update Slot status to occupied so it immediately reflects in the admin dashboard and parking bays
+    execute_db("UPDATE parking_slots SET status = 'occupied' WHERE id = %s", (slot_id,))
+
+    # Insert entry into parking history
     if initial_status == 'active':
-        execute_db("UPDATE parking_slots SET status = 'occupied' WHERE id = %s", (slot_id,))
-        # Insert initial entry into parking history
         execute_db("""
             INSERT INTO parking_history (booking_id, vehicle_number, slot_number, entry_time, status)
             VALUES (%s, %s, %s, NOW(), 'Active')
@@ -240,7 +241,7 @@ def cancel_booking(booking_id):
     execute_db("UPDATE bookings SET booking_status = 'cancelled' WHERE id = %s", (booking_id,))
 
     # If slot was occupied by this booking, restore slot to available
-    execute_db("UPDATE parking_slots SET status = 'available' WHERE id = %s AND status = 'occupied'", (booking['slot_id'],))
+    execute_db("UPDATE parking_slots SET status = 'available' WHERE id = %s", (booking['slot_id'],))
 
     # Update parking history
     slot = query_db("SELECT slot_number FROM parking_slots WHERE id = %s", (booking['slot_id'],), one=True)

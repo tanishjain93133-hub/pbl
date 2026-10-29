@@ -14,25 +14,36 @@ def dashboard():
         'available_slots': query_db("SELECT COUNT(*) as c FROM parking_slots WHERE status = 'available'", one=True)['c'],
         'occupied_slots': query_db("SELECT COUNT(*) as c FROM parking_slots WHERE status = 'occupied'", one=True)['c'],
         'maintenance_slots': query_db("SELECT COUNT(*) as c FROM parking_slots WHERE status = 'maintenance'", one=True)['c'],
-        'total_users': query_db("SELECT COUNT(*) as c FROM users WHERE role = 'user'", one=True)['c'],
+        'total_users': query_db("SELECT COUNT(*) as c FROM users", one=True)['c'],
         'total_bookings': query_db("SELECT COUNT(*) as c FROM bookings", one=True)['c'],
         'active_bookings': query_db("SELECT COUNT(*) as c FROM bookings WHERE booking_status = 'active'", one=True)['c'],
+        'booked_reservations': query_db("SELECT COUNT(*) as c FROM bookings WHERE booking_status = 'booked'", one=True)['c'],
         'completed_bookings': query_db("SELECT COUNT(*) as c FROM bookings WHERE booking_status = 'completed'", one=True)['c'],
     }
 
-    # All slots for overview grid
-    slots = query_db("SELECT * FROM parking_slots ORDER BY slot_number ASC")
+    # All slots with current active or booked reservation metadata for overview grid
+    slots = query_db("""
+        SELECT s.*, 
+               b.id as active_booking_id, b.booking_status, b.booking_date, b.start_time, b.end_time,
+               u.name as booked_by_user, u.email as booked_user_email, v.vehicle_number
+        FROM parking_slots s
+        LEFT JOIN bookings b ON s.id = b.slot_id AND b.booking_status IN ('active', 'booked')
+        LEFT JOIN users u ON b.user_id = u.id
+        LEFT JOIN vehicles v ON b.vehicle_id = v.id
+        GROUP BY s.id
+        ORDER BY s.slot_number ASC
+    """)
 
-    # Recent bookings (latest 6)
+    # Recent bookings (latest 10) - Use LEFT JOIN so no booking is ever silently hidden
     recent_bookings = query_db("""
         SELECT b.*, u.name as user_name, u.email as user_email, 
                v.vehicle_number, v.vehicle_type, s.slot_number, s.section
         FROM bookings b
-        JOIN users u ON b.user_id = u.id
-        JOIN vehicles v ON b.vehicle_id = v.id
-        JOIN parking_slots s ON b.slot_id = s.id
-        ORDER BY b.created_at DESC
-        LIMIT 6
+        LEFT JOIN users u ON b.user_id = u.id
+        LEFT JOIN vehicles v ON b.vehicle_id = v.id
+        LEFT JOIN parking_slots s ON b.slot_id = s.id
+        ORDER BY b.created_at DESC, b.id DESC
+        LIMIT 10
     """)
 
     return render_template('admin/dashboard.html', stats=stats, slots=slots, recent_bookings=recent_bookings)
@@ -44,21 +55,30 @@ def slots():
     section_filter = request.args.get('section', '').strip()
     status_filter = request.args.get('status', '').strip()
 
-    query = "SELECT * FROM parking_slots WHERE 1=1"
+    query = """
+        SELECT s.*, 
+               b.id as active_booking_id, b.booking_status, b.booking_date, b.start_time, b.end_time,
+               u.name as booked_by_user, u.email as booked_user_email, v.vehicle_number
+        FROM parking_slots s
+        LEFT JOIN bookings b ON s.id = b.slot_id AND b.booking_status IN ('active', 'booked')
+        LEFT JOIN users u ON b.user_id = u.id
+        LEFT JOIN vehicles v ON b.vehicle_id = v.id
+        WHERE 1=1
+    """
     params = []
 
     if search:
-        query += " AND (slot_number LIKE %s OR section LIKE %s OR floor LIKE %s)"
+        query += " AND (s.slot_number LIKE %s OR s.section LIKE %s OR s.floor LIKE %s OR v.vehicle_number LIKE %s OR u.name LIKE %s)"
         like_search = f"%{search}%"
-        params.extend([like_search, like_search, like_search])
+        params.extend([like_search, like_search, like_search, like_search, like_search])
     if section_filter:
-        query += " AND section = %s"
+        query += " AND s.section = %s"
         params.append(section_filter)
     if status_filter:
-        query += " AND status = %s"
+        query += " AND s.status = %s"
         params.append(status_filter)
 
-    query += " ORDER BY slot_number ASC"
+    query += " GROUP BY s.id ORDER BY s.slot_number ASC"
     slots_list = query_db(query, tuple(params))
 
     sections = [row['section'] for row in query_db("SELECT DISTINCT section FROM parking_slots ORDER BY section")]
@@ -162,7 +182,7 @@ def users():
         FROM users u
         LEFT JOIN vehicles v ON u.id = v.user_id
         LEFT JOIN bookings b ON u.id = b.user_id
-        WHERE u.role = 'user'
+        WHERE 1=1
     """
     params = []
 
@@ -171,7 +191,7 @@ def users():
         like_str = f"%{search}%"
         params.extend([like_str, like_str, like_str])
 
-    query += " GROUP BY u.id, u.name, u.email, u.phone, u.role, u.created_at ORDER BY u.created_at DESC"
+    query += " GROUP BY u.id, u.name, u.email, u.phone, u.role, u.created_at ORDER BY u.created_at DESC, u.id DESC"
     users_list = query_db(query, tuple(params))
 
     return render_template('admin/users.html', users=users_list, search=search)
@@ -188,9 +208,9 @@ def bookings():
                v.vehicle_number, v.vehicle_type,
                s.slot_number, s.section, s.floor
         FROM bookings b
-        JOIN users u ON b.user_id = u.id
-        JOIN vehicles v ON b.vehicle_id = v.id
-        JOIN parking_slots s ON b.slot_id = s.id
+        LEFT JOIN users u ON b.user_id = u.id
+        LEFT JOIN vehicles v ON b.vehicle_id = v.id
+        LEFT JOIN parking_slots s ON b.slot_id = s.id
         WHERE 1=1
     """
     params = []
@@ -206,7 +226,7 @@ def bookings():
         query += " AND b.booking_date = %s"
         params.append(date_filter)
 
-    query += " ORDER BY b.created_at DESC"
+    query += " ORDER BY b.created_at DESC, b.id DESC"
     bookings_list = query_db(query, tuple(params))
 
     return render_template(
@@ -241,21 +261,31 @@ def update_booking_status(booking_id):
         if existing_hist:
             execute_db("UPDATE parking_history SET status = 'Active', entry_time = IFNULL(entry_time, NOW()) WHERE booking_id = %s", (booking_id,))
         else:
-            v_num = query_db("SELECT vehicle_number FROM vehicles WHERE id = %s", (booking['vehicle_id'],), one=True)['vehicle_number']
-            s_num = query_db("SELECT slot_number FROM parking_slots WHERE id = %s", (booking['slot_id'],), one=True)['slot_number']
+            veh = query_db("SELECT vehicle_number FROM vehicles WHERE id = %s", (booking['vehicle_id'],), one=True)
+            v_num = veh['vehicle_number'] if veh else 'UNKNOWN'
+            s_slot = query_db("SELECT slot_number FROM parking_slots WHERE id = %s", (booking['slot_id'],), one=True)
+            s_num = s_slot['slot_number'] if s_slot else 'SLOT'
             execute_db("INSERT INTO parking_history (booking_id, vehicle_number, slot_number, entry_time, status) VALUES (%s, %s, %s, NOW(), 'Active')", (booking_id, v_num, s_num))
 
+    elif new_status == 'booked':
+        execute_db("UPDATE parking_slots SET status = 'occupied' WHERE id = %s", (booking['slot_id'],))
+        existing_hist = query_db("SELECT id FROM parking_history WHERE booking_id = %s", (booking_id,), one=True)
+        if existing_hist:
+            execute_db("UPDATE parking_history SET status = 'Booked' WHERE booking_id = %s", (booking_id,))
+        else:
+            veh = query_db("SELECT vehicle_number FROM vehicles WHERE id = %s", (booking['vehicle_id'],), one=True)
+            v_num = veh['vehicle_number'] if veh else 'UNKNOWN'
+            s_slot = query_db("SELECT slot_number FROM parking_slots WHERE id = %s", (booking['slot_id'],), one=True)
+            s_num = s_slot['slot_number'] if s_slot else 'SLOT'
+            execute_db("INSERT INTO parking_history (booking_id, vehicle_number, slot_number, entry_time, status) VALUES (%s, %s, %s, NULL, 'Booked')", (booking_id, v_num, s_num))
+
     elif new_status == 'completed':
-        execute_db("UPDATE parking_slots SET status = 'available' WHERE id = %s AND status = 'occupied'", (booking['slot_id'],))
+        execute_db("UPDATE parking_slots SET status = 'available' WHERE id = %s", (booking['slot_id'],))
         execute_db("UPDATE parking_history SET status = 'Completed', exit_time = IFNULL(exit_time, NOW()) WHERE booking_id = %s", (booking_id,))
 
     elif new_status == 'cancelled':
-        execute_db("UPDATE parking_slots SET status = 'available' WHERE id = %s AND status = 'occupied'", (booking['slot_id'],))
+        execute_db("UPDATE parking_slots SET status = 'available' WHERE id = %s", (booking['slot_id'],))
         execute_db("UPDATE parking_history SET status = 'Cancelled', exit_time = NOW() WHERE booking_id = %s", (booking_id,))
-
-    elif new_status == 'booked':
-        execute_db("UPDATE parking_slots SET status = 'available' WHERE id = %s AND status = 'occupied'", (booking['slot_id'],))
-        execute_db("UPDATE parking_history SET status = 'Booked' WHERE booking_id = %s", (booking_id,))
 
     flash(f"Booking #{booking_id} status changed to '{new_status.capitalize()}'.", 'success')
     return redirect(url_for('admin.bookings'))

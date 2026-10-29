@@ -18,7 +18,7 @@
                 <p class="hero-subtitle">
                     Find available parking slots, reserve your space and manage your parking history from one simple platform.
                 </p>
-                <div class="d-flex flex-wrap gap-3 mb-4">
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
                     <a href="{{ url_for('booking.parking') }}" class="btn btn-primary-sp btn-lg px-4 py-3">
                         <i class="bi bi-search me-2"></i> Find Parking
                     </a>
@@ -31,6 +31,10 @@
                             <i class="bi bi-person-plus me-2"></i> Get Started
                         </a>
                     {% endif %}
+                    <button type="button" class="btn btn-replay-intro" onclick="replayCarIntro()" title="Watch 3D Car Gateway Entrance Animation">
+                        <i class="bi bi-play-circle-fill fs-5 text-info"></i>
+                        <span>Watch Entrance</span>
+                    </button>
                 </div>
 
                 <!-- Quick Stats Strip -->

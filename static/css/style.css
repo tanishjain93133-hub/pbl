@@ -587,3 +587,481 @@ h1, h2, h3, h4, h5, h6 {
     padding: 1.25rem;
   }
 }
+
+/* ==========================================================================
+   SmartPark — Starting Point Car Entrance Animation & Intro Gate Reveal
+   ========================================================================== */
+
+#carIntroOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: radial-gradient(ellipse at 50% 30%, #172554 0%, #0b1329 55%, #050814 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), 
+              filter 0.85s ease, 
+              visibility 0.85s ease;
+  user-select: none;
+}
+
+#carIntroOverlay.intro-fade-out {
+  opacity: 0;
+  transform: scale(1.08);
+  filter: blur(12px);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Top Intro Header / HUD */
+.intro-hud-top {
+  padding: 1.75rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.intro-brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.intro-brand-logo {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.4rem;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.5);
+  animation: logoPulse 2s infinite ease-in-out;
+}
+
+.intro-brand-text h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.intro-brand-text span {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: monospace;
+}
+
+.intro-skip-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f1f5f9;
+  padding: 0.5rem 1.1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.intro-skip-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+  color: #ffffff;
+}
+
+/* Center Stage: Highway, Sky Grid, Parking Gate & Moving Vehicle */
+.intro-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Background Cyber Grid lines */
+.intro-grid-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background-image: 
+    linear-gradient(to right, rgba(59, 130, 246, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59, 130, 246, 0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+  pointer-events: none;
+}
+
+/* Ambient glow orb */
+.intro-glow-orb {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 260px;
+  background: radial-gradient(ellipse, rgba(37, 99, 235, 0.35) 0%, rgba(14, 165, 233, 0.1) 45%, transparent 75%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* Road surface & animated markings */
+.intro-road-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 220px;
+  background: linear-gradient(180deg, #090e1a 0%, #030712 100%);
+  border-top: 2px solid rgba(56, 189, 248, 0.4);
+  box-shadow: 0 -15px 35px rgba(37, 99, 235, 0.2);
+  perspective: 600px;
+}
+
+.intro-road-stripes {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 200%;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    #38bdf8 0px,
+    #38bdf8 60px,
+    transparent 60px,
+    transparent 120px
+  );
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+  animation: roadStripesMove 0.8s linear infinite;
+}
+
+.intro-road-curb-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #10b981, #38bdf8, #6366f1);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+}
+
+/* Boom Gate / Parking Barrier Structure */
+.intro-gate-station {
+  position: absolute;
+  right: 18%;
+  bottom: 80px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.intro-gate-post {
+  width: 28px;
+  height: 90px;
+  background: linear-gradient(180deg, #334155 0%, #0f172a 100%);
+  border: 1px solid #475569;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+}
+
+.gate-status-light {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin: 8px auto 0;
+  background: #ef4444;
+  box-shadow: 0 0 15px #ef4444;
+  transition: all 0.4s ease;
+}
+
+.gate-status-light.granted {
+  background: #10b981;
+  box-shadow: 0 0 20px #10b981;
+}
+
+/* Pivoting Barrier Arm */
+.intro-barrier-arm {
+  position: absolute;
+  bottom: 45px;
+  left: 14px;
+  width: 180px;
+  height: 10px;
+  background: repeating-linear-gradient(
+    45deg,
+    #ef4444 0px,
+    #ef4444 14px,
+    #ffffff 14px,
+    #ffffff 28px
+  );
+  border-radius: 4px;
+  transform-origin: left center;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+  transition: transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: rotate(0deg);
+}
+
+.intro-barrier-arm.open {
+  transform: rotate(-68deg);
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.9);
+}
+
+/* Scanner Laser Beam */
+.intro-scanner-beam {
+  position: absolute;
+  top: -80px;
+  left: -20px;
+  width: 4px;
+  height: 170px;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.2) 0%, #38bdf8 50%, rgba(56, 189, 248, 0.2) 100%);
+  box-shadow: 0 0 20px #38bdf8, 0 0 35px #0284c7;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.intro-scanner-beam.scanning {
+  opacity: 1;
+  animation: laserSweep 0.9s ease-in-out infinite alternate;
+}
+
+/* Entering Car Container */
+.intro-car-wrapper {
+  position: absolute;
+  bottom: 75px;
+  left: -380px;
+  z-index: 6;
+  width: 320px;
+  height: 110px;
+  animation: carEnterDrive 2.5s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+}
+
+/* Headlight Light Cone Projecting Forward */
+.car-headlight-cone {
+  position: absolute;
+  right: -240px;
+  top: 40px;
+  width: 250px;
+  height: 80px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.75) 0%, rgba(56, 189, 248, 0.35) 40%, transparent 100%);
+  clip-path: polygon(0 35%, 100% 0%, 100% 100%, 0 65%);
+  filter: blur(6px);
+  pointer-events: none;
+  opacity: 0.95;
+  animation: headlightGlow 1.5s ease-in-out infinite alternate;
+}
+
+/* Custom Vector Sports Car Body */
+.intro-car-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.85));
+}
+
+/* Animated Rotating Wheels */
+.car-wheel-rot {
+  transform-origin: center;
+  animation: wheelSpin 0.5s linear infinite;
+}
+
+/* Holographic Scanner HUD Card Floating over vehicle */
+.intro-hud-card {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 14px;
+  padding: 1.1rem 1.6rem;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(37, 99, 235, 0.3);
+  text-align: center;
+  min-width: 340px;
+  max-width: 440px;
+  z-index: 20;
+  transition: all 0.4s ease;
+}
+
+.intro-hud-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  margin-bottom: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.intro-hud-status-badge.granted {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.5);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+.intro-hud-title {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.intro-hud-sub {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-bottom: 0.85rem;
+}
+
+/* Initialization Progress Bar */
+.intro-progress-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.intro-progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #2563eb, #38bdf8, #10b981);
+  border-radius: 9999px;
+  transition: width 2.4s cubic-bezier(0.2, 0.8, 0.25, 1);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+}
+
+/* Bottom Footer Tip */
+.intro-hud-bottom {
+  padding: 1.25rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-family: monospace;
+}
+
+/* Keyframe Animations */
+@keyframes carEnterDrive {
+  0% {
+    left: -380px;
+    transform: translateY(0px);
+  }
+  50% {
+    left: 22%;
+    transform: translateY(-2px);
+  }
+  70% {
+    left: 36%;
+    transform: translateY(0px);
+  }
+  100% {
+    left: 88%;
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes wheelSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes roadStripesMove {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-120px);
+  }
+}
+
+@keyframes laserSweep {
+  0% {
+    transform: translateX(-35px);
+  }
+  100% {
+    transform: translateX(35px);
+  }
+}
+
+@keyframes headlightGlow {
+  0% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes logoPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.7);
+  }
+}
+
+/* Replay Intro Floating Button on Hero / Main */
+.btn-replay-intro {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8 !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(10px);
+  text-decoration: none;
+}
+
+.btn-replay-intro:hover {
+  background: rgba(37, 99, 235, 0.2);
+  border-color: #38bdf8;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+}

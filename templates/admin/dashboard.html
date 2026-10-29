@@ -112,19 +112,19 @@
 
             <div class="col-sm-6 col-lg-3">
                 <div class="stat-card">
-                    <div class="stat-icon-wrapper icon-amber">
-                        <i class="bi bi-tools"></i>
+                    <div class="stat-icon-wrapper icon-purple">
+                        <i class="bi bi-calendar-check"></i>
                     </div>
                     <div>
-                        <div class="stat-number">{{ stats.maintenance_slots }}</div>
-                        <div class="stat-label">In Maintenance</div>
+                        <div class="stat-number">{{ stats.booked_reservations or 0 }}</div>
+                        <div class="stat-label">Reserved / Booked</div>
                     </div>
                 </div>
             </div>
 
             <div class="col-sm-6 col-lg-3">
                 <div class="stat-card">
-                    <div class="stat-icon-wrapper icon-purple">
+                    <div class="stat-icon-wrapper icon-blue">
                         <i class="bi bi-people-fill"></i>
                     </div>
                     <div>
@@ -149,11 +149,11 @@
             <div class="col-sm-6 col-lg-3">
                 <div class="stat-card">
                     <div class="stat-icon-wrapper icon-green">
-                        <i class="bi bi-clock-history"></i>
+                        <i class="bi bi-play-circle-fill"></i>
                     </div>
                     <div>
                         <div class="stat-number">{{ stats.active_bookings }}</div>
-                        <div class="stat-label">Active Bookings</div>
+                        <div class="stat-label">Active Parked</div>
                     </div>
                 </div>
             </div>
@@ -175,18 +175,38 @@
         <div class="sp-card mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0 fw-bold"><i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>Campus Parking Bay Overview</h5>
-                <a href="{{ url_for('admin.slots') }}" class="small text-primary fw-bold text-decoration-none">Manage Slots</a>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">🟢 Available</span>
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">🔴 Occupied</span>
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">🟣 Booked</span>
+                    <a href="{{ url_for('admin.slots') }}" class="small text-primary fw-bold text-decoration-none">Manage Slots</a>
+                </div>
             </div>
 
             <div class="row g-2">
                 {% for s in slots %}
                     <div class="col-6 col-sm-4 col-md-3 col-xl-2">
-                        <div class="p-2 rounded-3 border text-center {% if s.status == 'available' %}bg-success bg-opacity-10 border-success{% elif s.status == 'occupied' %}bg-danger bg-opacity-10 border-danger{% else %}bg-warning bg-opacity-10 border-warning{% endif %}">
+                        <div class="p-2 rounded-3 border text-center {% if s.status == 'available' and not s.active_booking_id %}bg-success bg-opacity-10 border-success{% elif s.booking_status == 'booked' %}bg-primary bg-opacity-10 border-primary{% elif s.status == 'occupied' or s.booking_status == 'active' %}bg-danger bg-opacity-10 border-danger{% else %}bg-warning bg-opacity-10 border-warning{% endif %}">
                             <div class="fw-extrabold fs-5">{{ s.slot_number }}</div>
-                            <div class="text-muted" style="font-size:0.7rem;">{{ s.section }}</div>
-                            <span class="badge {% if s.status == 'available' %}bg-success{% elif s.status == 'occupied' %}bg-danger{% else %}bg-warning text-dark{% endif %}" style="font-size:0.65rem;">
-                                {{ s.status }}
-                            </span>
+                            <div class="text-muted text-truncate" style="font-size:0.7rem;">{{ s.section }}</div>
+                            {% if s.booking_status == 'active' %}
+                                <span class="badge bg-danger px-1 py-0" style="font-size:0.65rem;">Active Parked</span>
+                            {% elif s.booking_status == 'booked' %}
+                                <span class="badge bg-primary px-1 py-0" style="font-size:0.65rem;">Booked</span>
+                            {% elif s.status == 'occupied' %}
+                                <span class="badge bg-danger px-1 py-0" style="font-size:0.65rem;">Occupied</span>
+                            {% elif s.status == 'available' %}
+                                <span class="badge bg-success px-1 py-0" style="font-size:0.65rem;">Available</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark px-1 py-0" style="font-size:0.65rem;">Maintenance</span>
+                            {% endif %}
+                            
+                            {% if s.vehicle_number %}
+                                <div class="mt-1 pt-1 border-top border-secondary border-opacity-25" style="font-size:0.68rem;" title="{{ s.booked_by_user }} • {{ s.booking_date }} {{ s.start_time }}-{{ s.end_time }}">
+                                    <span class="fw-bold text-dark d-block text-truncate"><i class="bi bi-car-front me-1"></i>{{ s.vehicle_number }}</span>
+                                    <span class="text-muted d-block text-truncate">{{ s.booked_by_user }}</span>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}

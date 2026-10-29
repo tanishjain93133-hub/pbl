@@ -16,6 +16,163 @@
 </head>
 <body>
 
+    <!-- SmartPark Starting Point: Car Entrance & Boom Gate Intro Animation -->
+    <div id="carIntroOverlay" aria-hidden="true">
+        <!-- Top HUD -->
+        <div class="intro-hud-top">
+            <div class="intro-brand-badge">
+                <div class="intro-brand-logo">
+                    <i class="bi bi-p-square-fill"></i>
+                </div>
+                <div class="intro-brand-text">
+                    <h2>SmartPark</h2>
+                    <span>Autonomous Campus Gateway • PBL-I</span>
+                </div>
+            </div>
+            <button type="button" class="intro-skip-btn" id="introSkipBtn" title="Skip Intro (Esc)">
+                <span>Skip Intro</span>
+                <i class="bi bi-fast-forward-fill"></i>
+            </button>
+        </div>
+
+        <!-- Center Stage: Road, Perspective Grid, Gate Station and Car -->
+        <div class="intro-stage">
+            <div class="intro-grid-backdrop"></div>
+            <div class="intro-glow-orb"></div>
+
+            <!-- Holographic HUD Telemetry Card -->
+            <div class="intro-hud-card">
+                <div id="introHudStatus" class="intro-hud-status-badge">
+                    <span class="spinner-grow spinner-grow-sm me-1 text-info"></span> DETECTING VEHICLE APPROACH...
+                </div>
+                <div class="intro-hud-title">Smart Gateway Access</div>
+                <div class="intro-hud-sub">Automated RFID Slot Allocation • College PBL-I</div>
+                <div class="intro-progress-bar-wrap">
+                    <div id="introProgressFill" class="intro-progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <!-- Parking Approach Road -->
+            <div class="intro-road-container">
+                <div class="intro-road-curb-top"></div>
+                <div class="intro-road-stripes"></div>
+
+                <!-- Boom Gate Station -->
+                <div class="intro-gate-station">
+                    <div class="intro-gate-post">
+                        <div id="introGateLight" class="gate-status-light"></div>
+                    </div>
+                    <div id="introBarrierArm" class="intro-barrier-arm"></div>
+                    <div id="introScannerBeam" class="intro-scanner-beam"></div>
+                </div>
+
+                <!-- Animated Approaching Car -->
+                <div id="introCar" class="intro-car-wrapper">
+                    <!-- Headlight beam projection -->
+                    <div class="car-headlight-cone"></div>
+
+                    <!-- Custom Futuristic Sports Sedan SVG -->
+                    <svg class="intro-car-svg" viewBox="0 0 320 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="carBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#38bdf8" />
+                                <stop offset="30%" stop-color="#2563eb" />
+                                <stop offset="85%" stop-color="#0f172a" />
+                                <stop offset="100%" stop-color="#0284c7" />
+                            </linearGradient>
+                            <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(147, 197, 253, 0.9)" />
+                                <stop offset="100%" stop-color="rgba(15, 23, 42, 0.95)" />
+                            </linearGradient>
+                            <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="3" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                        </defs>
+
+                        <!-- Chassis shadow -->
+                        <ellipse cx="160" cy="98" rx="145" ry="8" fill="rgba(0,0,0,0.6)" filter="blur(4px)" />
+
+                        <!-- Car main body silhouette -->
+                        <path d="M 12 76 
+                                 C 16 68, 30 65, 52 64
+                                 C 78 63, 98 42, 126 34
+                                 C 160 25, 215 25, 238 42
+                                 C 260 54, 280 62, 306 68
+                                 C 314 70, 318 78, 314 84
+                                 C 308 90, 290 92, 275 92
+                                 C 272 82, 260 74, 246 74
+                                 C 232 74, 220 82, 217 92
+                                 L 105 92
+                                 C 102 82, 90 74, 76 74
+                                 C 62 74, 50 82, 47 92
+                                 L 20 92
+                                 C 12 90, 8 82, 12 76 Z" 
+                              fill="url(#carBodyGrad)" stroke="#60a5fa" stroke-width="1.5" />
+
+                        <!-- Aerodynamic side accent line -->
+                        <path d="M 54 68 Q 150 64 290 74" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" fill="none" />
+
+                        <!-- Cabin Glass (Windshield, side windows) -->
+                        <path d="M 124 37
+                                 C 152 30, 204 30, 226 44
+                                 L 232 58
+                                 L 108 58
+                                 C 114 48, 118 42, 124 37 Z" 
+                              fill="url(#glassGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+
+                        <!-- Window pillar division -->
+                        <line x1="168" y1="32" x2="165" y2="58" stroke="#0f172a" stroke-width="4" />
+
+                        <!-- LED Headlight Strip (Front Right) -->
+                        <polygon points="296,69 314,72 308,76 292,74" fill="#ffffff" filter="url(#neonGlow)" />
+                        <circle cx="312" cy="73" r="3" fill="#38bdf8" filter="url(#neonGlow)" />
+
+                        <!-- LED Taillight Strip (Back Left) -->
+                        <polygon points="12,74 24,73 22,78 14,80" fill="#ef4444" filter="url(#neonGlow)" />
+                        <line x1="12" y1="76" x2="26" y2="76" stroke="#f87171" stroke-width="2" filter="url(#neonGlow)" />
+
+                        <!-- Front Wheel Arch & Wheel (Right) -->
+                        <g transform="translate(246, 88)">
+                            <circle cx="0" cy="0" r="18" fill="#0f172a" stroke="#334155" stroke-width="3" />
+                            <circle cx="0" cy="0" r="14" fill="#1e293b" />
+                            <!-- Wheel Rim rotating group -->
+                            <g class="car-wheel-rot">
+                                <circle cx="0" cy="0" r="10" stroke="#94a3b8" stroke-width="2" fill="none" />
+                                <line x1="-10" y1="0" x2="10" y2="0" stroke="#38bdf8" stroke-width="2.5" />
+                                <line x1="0" y1="-10" x2="0" y2="10" stroke="#38bdf8" stroke-width="2.5" />
+                                <line x1="-7" y1="-7" x2="7" y2="7" stroke="#94a3b8" stroke-width="2" />
+                                <line x1="-7" y1="7" x2="7" y2="-7" stroke="#94a3b8" stroke-width="2" />
+                                <circle cx="0" cy="0" r="4" fill="#38bdf8" />
+                            </g>
+                        </g>
+
+                        <!-- Rear Wheel Arch & Wheel (Left) -->
+                        <g transform="translate(76, 88)">
+                            <circle cx="0" cy="0" r="18" fill="#0f172a" stroke="#334155" stroke-width="3" />
+                            <circle cx="0" cy="0" r="14" fill="#1e293b" />
+                            <!-- Wheel Rim rotating group -->
+                            <g class="car-wheel-rot">
+                                <circle cx="0" cy="0" r="10" stroke="#94a3b8" stroke-width="2" fill="none" />
+                                <line x1="-10" y1="0" x2="10" y2="0" stroke="#38bdf8" stroke-width="2.5" />
+                                <line x1="0" y1="-10" x2="0" y2="10" stroke="#38bdf8" stroke-width="2.5" />
+                                <line x1="-7" y1="-7" x2="7" y2="7" stroke="#94a3b8" stroke-width="2" />
+                                <line x1="-7" y1="7" x2="7" y2="-7" stroke="#94a3b8" stroke-width="2" />
+                                <circle cx="0" cy="0" r="4" fill="#38bdf8" />
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom HUD Status Bar -->
+        <div class="intro-hud-bottom">
+            <div><i class="bi bi-shield-check text-success me-2"></i>SMARTPARK™ IOT GATEWAY VER. 2.6 • LIVE TELEMETRY</div>
+            <div class="d-none d-md-block text-muted">Press <kbd class="bg-dark text-light border border-secondary px-2 py-1 rounded">ESC</kbd> to skip intro</div>
+        </div>
+    </div>
+
     <!-- Main Navigation Bar -->
     <nav class="navbar navbar-expand-lg smart-navbar sticky-top">
         <div class="container-fluid px-lg-4">
@@ -83,6 +240,10 @@
                                     <li><a class="dropdown-item py-2" href="{{ url_for('admin.slots') }}"><i class="bi bi-p-square me-2"></i> Parking Slots</a></li>
                                     <li><a class="dropdown-item py-2" href="{{ url_for('admin.bookings') }}"><i class="bi bi-receipt me-2"></i> All Bookings</a></li>
                                     <li><a class="dropdown-item py-2" href="{{ url_for('admin.users') }}"><i class="bi bi-people me-2"></i> Registered Users</a></li>
+                                    <li><a class="dropdown-item py-2" href="{{ url_for('admin.history') }}"><i class="bi bi-clock-history me-2"></i> Campus History</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item py-2" href="{{ url_for('user.vehicles') }}"><i class="bi bi-car-front me-2"></i> My Registered Vehicles</a></li>
+                                    <li><a class="dropdown-item py-2" href="{{ url_for('booking.parking') }}"><i class="bi bi-calendar-plus me-2"></i> Book a Parking Bay</a></li>
                                 {% else %}
                                     <li><a class="dropdown-item py-2" href="{{ url_for('user.profile') }}"><i class="bi bi-person me-2"></i> My Profile</a></li>
                                     <li><a class="dropdown-item py-2" href="{{ url_for('user.vehicles') }}"><i class="bi bi-car-front me-2"></i> My Vehicles</a></li>

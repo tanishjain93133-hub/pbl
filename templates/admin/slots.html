@@ -101,6 +101,7 @@
                                 <th>Floor</th>
                                 <th>Designated Type</th>
                                 <th>Status</th>
+                                <th>Current Reservation</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -114,12 +115,30 @@
                                     <td><span class="badge bg-light text-dark border">{{ s.floor }}</span></td>
                                     <td>{{ s.vehicle_type }}</td>
                                     <td>
-                                        {% if s.status == 'available' %}
+                                        {% if s.status == 'available' and not s.active_booking_id %}
                                             <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">🟢 Available</span>
-                                        {% elif s.status == 'occupied' %}
+                                        {% elif s.booking_status == 'booked' %}
+                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1">🟣 Booked</span>
+                                        {% elif s.status == 'occupied' or s.booking_status == 'active' %}
                                             <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">🔴 Occupied</span>
                                         {% else %}
                                             <span class="badge bg-warning bg-opacity-10 text-warning text-dark border border-warning border-opacity-25 px-2 py-1">🟡 Maintenance</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if s.vehicle_number %}
+                                            <div>
+                                                <span class="badge bg-light text-dark border fw-bold"><i class="bi bi-car-front me-1"></i>{{ s.vehicle_number }}</span>
+                                                <span class="badge {% if s.booking_status == 'active' %}bg-danger{% else %}bg-primary{% endif %} ms-1" style="font-size:0.65rem;">
+                                                    {{ s.booking_status }}
+                                                </span>
+                                            </div>
+                                            <div class="text-muted small mt-1">
+                                                <span>{{ s.booked_by_user }}</span>
+                                                <span class="text-secondary">({{ s.booking_date }} {{ s.start_time }}–{{ s.end_time }})</span>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted small"><i class="bi bi-check2 text-success me-1"></i>Free Bay</span>
                                         {% endif %}
                                     </td>
                                     <td class="text-end">
