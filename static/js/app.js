@@ -112,10 +112,21 @@ function showCustomToast(message, type = 'info') {
 }
 
 // ==========================================================================
-// 4. SmartPark — Car Entrance Starting Point Animation Controller
+// 4. SmartPark — Mercedes/BMW Autonomous Parking Intro Animation Controller
+//    Phase 1: Car approaches campus parking deck from left
+//    Phase 2: LiDAR activates, amber turn signals blink
+//    Phase 3: Car decelerates, steers into BAY A-01 lane
+//    Phase 4: Car parks, brake lights flare, sensor turns red
+//    Phase 5: HUD shows PARKED & RESERVED
+//    Phase 6: Overlay scales & dissolves into website
 // ==========================================================================
 
-let introTimeout1, introTimeout2, introTimeout3;
+let introTimeouts = [];
+
+function clearIntroTimeouts() {
+    introTimeouts.forEach(t => clearTimeout(t));
+    introTimeouts = [];
+}
 
 function initCarIntroAnimation(force = false) {
     const overlay = document.getElementById('carIntroOverlay');
@@ -129,73 +140,116 @@ function initCarIntroAnimation(force = false) {
         return;
     }
 
-    // Clear previous timeouts if replayed
-    clearTimeout(introTimeout1);
-    clearTimeout(introTimeout2);
-    clearTimeout(introTimeout3);
+    clearIntroTimeouts();
 
     // Prepare fresh visual state
     overlay.style.display = 'flex';
     overlay.classList.remove('intro-fade-out');
 
-    const car = document.getElementById('introCar');
-    const fill = document.getElementById('introProgressFill');
-    const statusBadge = document.getElementById('introHudStatus');
-    const gateArm = document.getElementById('introBarrierArm');
-    const gateLight = document.getElementById('introGateLight');
-    const scannerBeam = document.getElementById('introScannerBeam');
+    // Gather all element refs
+    const car          = document.getElementById('introCar');
+    const fill         = document.getElementById('introProgressFill');
+    const statusBadge  = document.getElementById('introHudStatus');
+    const hudTitle     = document.getElementById('introHudTitle');
+    const hudSub       = document.getElementById('introHudSub');
+    const sensorOrbA01 = document.getElementById('sensorOrbA01');
+    const sensorTextA01= document.getElementById('sensorTextA01');
+    const stencilA01   = document.getElementById('stencilA01');
+    const scannerHolo  = document.getElementById('scannerHoloA01');
+    const tailLight    = document.getElementById('carTailLight');
+    const gantryStatus = document.getElementById('gantryDeckStatus');
+    const gantryAuto   = document.getElementById('gantryAutopilotMode');
 
+    // ——— RESET all elements ———
     if (fill) fill.style.width = '0%';
-    if (gateArm) gateArm.classList.remove('open');
-    if (gateLight) gateLight.classList.remove('granted');
-    if (scannerBeam) scannerBeam.classList.remove('scanning');
-    
+    if (sensorOrbA01)  { sensorOrbA01.className = 'sensor-orb orb-green'; }
+    if (sensorTextA01) { sensorTextA01.textContent = 'BAY A-01 [VACANT]'; }
+    if (scannerHolo)   { scannerHolo.classList.remove('active'); }
+    if (tailLight)     { tailLight.classList.remove('braking'); }
+    if (gantryStatus)  { gantryStatus.textContent = '1 BAY VACANT'; gantryStatus.className = 'gantry-val text-success'; }
+    if (gantryAuto)    { gantryAuto.textContent = 'SCANNING LOT...'; gantryAuto.className = 'gantry-val text-warning'; }
+
     if (statusBadge) {
         statusBadge.classList.remove('granted');
-        statusBadge.innerHTML = '<span class="spinner-grow spinner-grow-sm me-1 text-info"></span> DETECTING VEHICLE APPROACH...';
+        statusBadge.innerHTML = '<span class="spinner-grow spinner-grow-sm me-1 text-info"></span> MERCEDES-BENZ / BMW AI VALET CONNECTED';
     }
+    if (hudTitle) hudTitle.textContent = 'Approaching Campus Parking Deck';
+    if (hudSub)   hudSub.textContent   = 'Automated LiDAR Bay Detection & Autonomous Self-Parking';
 
-    // Restart car drive animation
+    // ——— Restart Mercedes drive animation ———
     if (car) {
         car.style.animation = 'none';
-        void car.offsetWidth; // trigger reflow
-        car.style.animation = 'carEnterDrive 2.6s cubic-bezier(0.2, 0.8, 0.25, 1) forwards';
+        void car.offsetWidth; // force reflow
+        car.style.animation = 'mercedesDriveIn 4.5s cubic-bezier(0.15, 0.85, 0.3, 1) forwards';
     }
 
-    // Fill progress gauge
-    setTimeout(() => {
+    // ——— Progress bar fills over the whole animation duration ———
+    introTimeouts.push(setTimeout(() => {
         if (fill) fill.style.width = '100%';
-    }, 60);
+    }, 80));
 
-    // Step 1: RFID & Laser Scanning vehicle license plate
-    introTimeout1 = setTimeout(() => {
-        if (scannerBeam) scannerBeam.classList.add('scanning');
+    // ——— PHASE 1 (t=0.8s): LiDAR activates, scanning campus deck ———
+    introTimeouts.push(setTimeout(() => {
+        if (gantryAuto) { gantryAuto.textContent = 'AI LIDAR ACTIVE'; gantryAuto.className = 'gantry-val text-info'; }
         if (statusBadge) {
-            statusBadge.innerHTML = '<i class="bi bi-upc-scan me-1 text-warning"></i> AI SCANNING: GJ-01-SP-2026...';
+            statusBadge.innerHTML = '<i class="bi bi-radar me-1 text-info"></i> LIDAR SCAN: DETECTING BAY A-01...';
         }
-    }, 750);
+        if (hudTitle) hudTitle.textContent = 'LiDAR Sweep — Locating Free Bay';
+    }, 800));
 
-    // Step 2: Access Granted & Boom barrier arm lifts up
-    introTimeout2 = setTimeout(() => {
-        if (scannerBeam) scannerBeam.classList.remove('scanning');
-        if (gateArm) gateArm.classList.add('open');
-        if (gateLight) gateLight.classList.add('granted');
+    // ——— PHASE 2 (t=1.6s): Bay A-01 detected, scanner hologram activates, amber blinker starts ———
+    introTimeouts.push(setTimeout(() => {
+        if (scannerHolo) scannerHolo.classList.add('active');
+        if (statusBadge) {
+            statusBadge.innerHTML = '<i class="bi bi-geo-alt-fill me-1 text-warning"></i> BAY A-01 IDENTIFIED — PLOTTING TRAJECTORY';
+        }
+        if (hudTitle) hudTitle.textContent = 'Bay A-01 Detected — Activating Turn Signals';
+        if (hudSub)   hudSub.textContent   = 'Amber LED turn indicators engaged • Steering into bay lane';
+        if (gantryAuto) { gantryAuto.textContent = 'TRAJECTORY MAPPED'; gantryAuto.className = 'gantry-val text-warning'; }
+    }, 1600));
+
+    // ——— PHASE 3 (t=2.5s): Deceleration, car starts turning into bay ———
+    introTimeouts.push(setTimeout(() => {
+        if (statusBadge) {
+            statusBadge.innerHTML = '<i class="bi bi-arrow-up-right-square-fill me-1 text-warning"></i> AUTONOMOUS STEERING — ENTERING BAY A-01';
+        }
+        if (hudTitle) hudTitle.textContent = 'Steering into Bay A-01';
+        if (hudSub)   hudSub.textContent   = 'Precision reverse-parking maneuver in progress...';
+    }, 2500));
+
+    // ——— PHASE 4 (t=3.3s): Car is parking — brake lights flare, sensor turns red/occupied ———
+    introTimeouts.push(setTimeout(() => {
+        if (tailLight) tailLight.classList.add('braking');
+        if (sensorOrbA01) { sensorOrbA01.className = 'sensor-orb orb-red'; }
+        if (sensorTextA01) { sensorTextA01.textContent = 'BAY A-01 [PARKED]'; }
+        if (stencilA01)    { stencilA01.textContent = '✓ GJ-01-SP'; }
+        if (gantryStatus)  { gantryStatus.textContent = '0 BAYS VACANT'; gantryStatus.className = 'gantry-val text-danger'; }
+        if (gantryAuto)    { gantryAuto.textContent = 'PARKED & LOCKED'; gantryAuto.className = 'gantry-val text-success'; }
         if (statusBadge) {
             statusBadge.classList.add('granted');
-            statusBadge.innerHTML = '<i class="bi bi-check-circle-fill me-1 text-success"></i> ACCESS GRANTED • BAY A-01 ALLOCATED';
+            statusBadge.innerHTML = '<i class="bi bi-patch-check-fill me-1 text-success"></i> PARKED & SECURED • BAY A-01 RESERVED';
         }
-    }, 1500);
+        if (hudTitle) hudTitle.textContent = 'Autonomous Parking Complete ✓';
+        if (hudSub)   hudSub.textContent   = 'Vehicle locked • SmartPark slot GJ-01-SP confirmed';
+    }, 3300));
 
-    // Step 3: Smooth website open & blur fade out
-    introTimeout3 = setTimeout(() => {
+    // ——— PHASE 5 (t=4.0s): Final welcome HUD, website about to reveal ———
+    introTimeouts.push(setTimeout(() => {
+        if (statusBadge) {
+            statusBadge.innerHTML = '<i class="bi bi-stars me-1"></i> WELCOME TO SMARTPARK CAMPUS GATEWAY';
+        }
+        if (hudTitle) hudTitle.textContent = '🏁 PARKED & RESERVED • Welcome to SmartPark';
+        if (hudSub)   hudSub.textContent   = 'Campus parking managed by AI — Enter your dashboard';
+    }, 4000));
+
+    // ——— PHASE 6 (t=5.2s): Smooth scale-up & blur dissolve into homepage ———
+    introTimeouts.push(setTimeout(() => {
         closeCarIntroOverlay();
-    }, 2700);
+    }, 5200));
 }
 
 function closeCarIntroOverlay() {
-    clearTimeout(introTimeout1);
-    clearTimeout(introTimeout2);
-    clearTimeout(introTimeout3);
+    clearIntroTimeouts();
 
     const overlay = document.getElementById('carIntroOverlay');
     if (!overlay) return;
@@ -205,7 +259,7 @@ function closeCarIntroOverlay() {
 
     setTimeout(() => {
         overlay.style.display = 'none';
-    }, 850);
+    }, 900);
 }
 
 function replayCarIntro() {

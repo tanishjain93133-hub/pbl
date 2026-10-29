@@ -18,157 +18,366 @@
 
     <!-- SmartPark Starting Point: Car Entrance & Boom Gate Intro Animation -->
     <div id="carIntroOverlay" aria-hidden="true">
-        <!-- Top HUD -->
+        <!-- Top HUD Navigation / Controls -->
         <div class="intro-hud-top">
             <div class="intro-brand-badge">
                 <div class="intro-brand-logo">
-                    <i class="bi bi-p-square-fill"></i>
+                    <i class="bi bi-car-front-fill"></i>
                 </div>
                 <div class="intro-brand-text">
-                    <h2>SmartPark</h2>
-                    <span>Autonomous Campus Gateway • PBL-I</span>
+                    <h2>SmartPark™ Autonomous Valet</h2>
+                    <span>Campus Smart Parking Deck • Level 01</span>
                 </div>
             </div>
             <button type="button" class="intro-skip-btn" id="introSkipBtn" title="Skip Intro (Esc)">
-                <span>Skip Intro</span>
-                <i class="bi bi-fast-forward-fill"></i>
+                <span>Enter Website</span>
+                <i class="bi bi-arrow-right-circle-fill"></i>
             </button>
         </div>
 
-        <!-- Center Stage: Road, Perspective Grid, Gate Station and Car -->
+        <!-- Center Stage: Full Campus Parking Arena & Autonomous Luxury Vehicle -->
         <div class="intro-stage">
             <div class="intro-grid-backdrop"></div>
             <div class="intro-glow-orb"></div>
 
-            <!-- Holographic HUD Telemetry Card -->
+            <!-- Overhead Digital Gantry Sign -->
+            <div class="intro-gantry-board">
+                <div class="gantry-content">
+                    <div class="gantry-header">
+                        <span class="gantry-live-dot"></span>
+                        <span class="gantry-title">SMARTPARK DIGITAL LOT GUIDANCE • CAMPUS DECK A</span>
+                    </div>
+                    <div class="gantry-metrics">
+                        <div class="gantry-metric">
+                            <span class="gantry-label">DECK STATUS</span>
+                            <span id="gantryDeckStatus" class="gantry-val text-success">1 BAY VACANT</span>
+                        </div>
+                        <div class="gantry-metric">
+                            <span class="gantry-label">TARGET ALLOCATION</span>
+                            <span id="gantryAllocatedBay" class="gantry-val text-info">BAY A-01</span>
+                        </div>
+                        <div class="gantry-metric">
+                            <span class="gantry-label">AUTOPILOT</span>
+                            <span id="gantryAutopilotMode" class="gantry-val text-warning">SCANNING LOT...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Autonomous Valet Telemetry Card -->
             <div class="intro-hud-card">
                 <div id="introHudStatus" class="intro-hud-status-badge">
-                    <span class="spinner-grow spinner-grow-sm me-1 text-info"></span> DETECTING VEHICLE APPROACH...
+                    <span class="spinner-grow spinner-grow-sm me-1 text-info"></span> MERCEDES-BENZ / BMW AI VALET CONNECTED
                 </div>
-                <div class="intro-hud-title">Smart Gateway Access</div>
-                <div class="intro-hud-sub">Automated RFID Slot Allocation • College PBL-I</div>
+                <div class="intro-hud-title" id="introHudTitle">Approaching Campus Parking Deck</div>
+                <div class="intro-hud-sub" id="introHudSub">Automated LiDAR Bay Detection & Autonomous Self-Parking</div>
                 <div class="intro-progress-bar-wrap">
                     <div id="introProgressFill" class="intro-progress-bar-fill"></div>
                 </div>
             </div>
 
-            <!-- Parking Approach Road -->
-            <div class="intro-road-container">
-                <div class="intro-road-curb-top"></div>
-                <div class="intro-road-stripes"></div>
+            <!-- Campus Parking Deck Ground & Drive Area -->
+            <div class="intro-parking-deck">
+                <!-- Asphalt Curb & Safety Bollards -->
+                <div class="parking-deck-backdrop"></div>
 
-                <!-- Boom Gate Station -->
-                <div class="intro-gate-station">
-                    <div class="intro-gate-post">
-                        <div id="introGateLight" class="gate-status-light"></div>
+                <!-- Three Smart Parking Bays -->
+                <div class="parking-bays-strip">
+                    <!-- BAY A-01: Available Target Bay where Mercedes/BMW will park -->
+                    <div id="baySlotA01" class="parking-bay-unit bay-target bay-vacant">
+                        <div class="bay-overhead-sensor">
+                            <div id="sensorOrbA01" class="sensor-orb orb-green"></div>
+                            <span id="sensorTextA01" class="sensor-code">BAY A-01 [VACANT]</span>
+                        </div>
+                        <div class="bay-ground-area" id="groundAreaA01">
+                            <div class="bay-scanner-hologram" id="scannerHoloA01"></div>
+                            <div class="bay-marker-line marker-left"></div>
+                            <div class="bay-marker-line marker-right"></div>
+                            <div class="bay-floor-stencil" id="stencilA01">P • BAY A-01</div>
+                            <div class="bay-wheel-stopper"></div>
+                        </div>
                     </div>
-                    <div id="introBarrierArm" class="intro-barrier-arm"></div>
-                    <div id="introScannerBeam" class="intro-scanner-beam"></div>
+
+                    <!-- BAY A-02: Occupied by Existing Vehicle -->
+                    <div class="parking-bay-unit bay-occupied">
+                        <div class="bay-overhead-sensor">
+                            <div class="sensor-orb orb-red"></div>
+                            <span class="sensor-code">BAY A-02 [OCCUPIED]</span>
+                        </div>
+                        <div class="bay-ground-area">
+                            <div class="bay-marker-line marker-left"></div>
+                            <div class="bay-marker-line marker-right"></div>
+                            <!-- Parked Blue Sedan SVG -->
+                            <div class="parked-vehicle-card parked-car-blue">
+                                <svg viewBox="0 0 180 85" class="parked-car-svg" fill="none">
+                                    <ellipse cx="90" cy="78" rx="80" ry="6" fill="rgba(0,0,0,0.7)" filter="blur(2px)"/>
+                                    <path d="M 10 58 C 15 50, 30 46, 50 44 C 70 30, 110 30, 130 44 C 150 46, 165 52, 172 58 C 176 65, 170 72, 155 72 L 25 72 C 12 72, 8 64, 10 58 Z" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.5"/>
+                                    <path d="M 52 44 C 68 32, 112 32, 128 44 Z" fill="rgba(147, 197, 253, 0.4)" stroke="#60a5fa" stroke-width="1"/>
+                                    <circle cx="45" cy="70" r="10" fill="#0f172a" stroke="#475569" stroke-width="2"/>
+                                    <circle cx="135" cy="70" r="10" fill="#0f172a" stroke="#475569" stroke-width="2"/>
+                                    <circle cx="45" cy="70" r="4" fill="#94a3b8"/>
+                                    <circle cx="135" cy="70" r="4" fill="#94a3b8"/>
+                                </svg>
+                            </div>
+                            <div class="bay-floor-stencil">BAY A-02</div>
+                            <div class="bay-wheel-stopper"></div>
+                        </div>
+                    </div>
+
+                    <!-- BAY A-03: Occupied by Existing Vehicle -->
+                    <div class="parking-bay-unit bay-occupied">
+                        <div class="bay-overhead-sensor">
+                            <div class="sensor-orb orb-red"></div>
+                            <span class="sensor-code">BAY A-03 [OCCUPIED]</span>
+                        </div>
+                        <div class="bay-ground-area">
+                            <div class="bay-marker-line marker-left"></div>
+                            <div class="bay-marker-line marker-right"></div>
+                            <!-- Parked Silver Luxury Coupe SVG -->
+                            <div class="parked-vehicle-card parked-car-silver">
+                                <svg viewBox="0 0 180 85" class="parked-car-svg" fill="none">
+                                    <ellipse cx="90" cy="78" rx="80" ry="6" fill="rgba(0,0,0,0.7)" filter="blur(2px)"/>
+                                    <path d="M 12 60 C 18 52, 34 47, 54 44 C 74 31, 112 31, 132 44 C 150 48, 164 54, 170 60 C 174 66, 168 72, 154 72 L 26 72 C 14 72, 10 65, 12 60 Z" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+                                    <path d="M 56 44 C 72 33, 114 33, 130 44 Z" fill="rgba(226, 232, 240, 0.4)" stroke="#cbd5e1" stroke-width="1"/>
+                                    <circle cx="46" cy="70" r="10" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+                                    <circle cx="134" cy="70" r="10" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+                                    <circle cx="46" cy="70" r="4" fill="#f8fafc"/>
+                                    <circle cx="134" cy="70" r="4" fill="#f8fafc"/>
+                                </svg>
+                            </div>
+                            <div class="bay-floor-stencil">BAY A-03</div>
+                            <div class="bay-wheel-stopper"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Animated Approaching Car -->
-                <div id="introCar" class="intro-car-wrapper">
-                    <!-- Headlight beam projection -->
-                    <div class="car-headlight-cone"></div>
+                <!-- Drive Aisle / Asphalt Runway -->
+                <div class="parking-drive-aisle">
+                    <div class="aisle-lane-markings"></div>
+                    <div class="aisle-guidance-arrows">
+                        <span>➔ ➔ ➔ AUTONOMOUS LANE • 10 KM/H ➔ ➔ ➔</span>
+                    </div>
 
-                    <!-- Custom Futuristic Sports Sedan SVG -->
-                    <svg class="intro-car-svg" viewBox="0 0 320 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="carBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#38bdf8" />
-                                <stop offset="30%" stop-color="#2563eb" />
-                                <stop offset="85%" stop-color="#0f172a" />
-                                <stop offset="100%" stop-color="#0284c7" />
-                            </linearGradient>
-                            <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="rgba(147, 197, 253, 0.9)" />
-                                <stop offset="100%" stop-color="rgba(15, 23, 42, 0.95)" />
-                            </linearGradient>
-                            <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-                                <feGaussianBlur stdDeviation="3" result="blur" />
-                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                            </filter>
-                        </defs>
+                    <!-- ============================================================== -->
+                    <!-- THE BIG LUXURY MERCEDES-BENZ / BMW SPORTS SEDAN CONTAINER     -->
+                    <!-- ============================================================== -->
+                    <div id="introCar" class="intro-mercedes-container">
+                        <!-- Projected Twin Volumetric Laser Headlight Beams -->
+                        <div class="laser-beam-cone beam-left"></div>
+                        <div class="laser-beam-cone beam-right"></div>
 
-                        <!-- Chassis shadow -->
-                        <ellipse cx="160" cy="98" rx="145" ry="8" fill="rgba(0,0,0,0.6)" filter="blur(4px)" />
+                        <!-- LiDAR Sonar Pulse Wave Radiating from Front Bumper -->
+                        <div id="carLidarPulse" class="car-lidar-pulse"></div>
 
-                        <!-- Car main body silhouette -->
-                        <path d="M 12 76 
-                                 C 16 68, 30 65, 52 64
-                                 C 78 63, 98 42, 126 34
-                                 C 160 25, 215 25, 238 42
-                                 C 260 54, 280 62, 306 68
-                                 C 314 70, 318 78, 314 84
-                                 C 308 90, 290 92, 275 92
-                                 C 272 82, 260 74, 246 74
-                                 C 232 74, 220 82, 217 92
-                                 L 105 92
-                                 C 102 82, 90 74, 76 74
-                                 C 62 74, 50 82, 47 92
-                                 L 20 92
-                                 C 12 90, 8 82, 12 76 Z" 
-                              fill="url(#carBodyGrad)" stroke="#60a5fa" stroke-width="1.5" />
+                        <!-- High-Detail Luxury Mercedes-Benz / BMW Dynamic 3/4 Vector Artwork -->
+                        <svg class="mercedes-luxury-svg" viewBox="0 0 540 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <!-- Metallic Obsidian / Deep Sapphire Paint Gradient -->
+                                <linearGradient id="mercBodyGrad" x1="0%" y1="0%" x2="100%" y2="80%">
+                                    <stop offset="0%" stop-color="#020617" />
+                                    <stop offset="20%" stop-color="#0f172a" />
+                                    <stop offset="45%" stop-color="#1e293b" />
+                                    <stop offset="70%" stop-color="#2563eb" />
+                                    <stop offset="85%" stop-color="#0f172a" />
+                                    <stop offset="100%" stop-color="#020617" />
+                                </linearGradient>
 
-                        <!-- Aerodynamic side accent line -->
-                        <path d="M 54 68 Q 150 64 290 74" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" fill="none" />
+                                <!-- Liquid Chrome Highlight Gradient -->
+                                <linearGradient id="mercChromeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#94a3b8" />
+                                    <stop offset="35%" stop-color="#f8fafc" />
+                                    <stop offset="50%" stop-color="#ffffff" />
+                                    <stop offset="75%" stop-color="#cbd5e1" />
+                                    <stop offset="100%" stop-color="#64748b" />
+                                </linearGradient>
 
-                        <!-- Cabin Glass (Windshield, side windows) -->
-                        <path d="M 124 37
-                                 C 152 30, 204 30, 226 44
-                                 L 232 58
-                                 L 108 58
-                                 C 114 48, 118 42, 124 37 Z" 
-                              fill="url(#glassGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+                                <!-- Windshield Gradient with Cockpit Glow -->
+                                <linearGradient id="mercGlassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#1e1b4b" stop-opacity="0.95" />
+                                    <stop offset="40%" stop-color="#0f172a" stop-opacity="0.92" />
+                                    <stop offset="80%" stop-color="#0284c7" stop-opacity="0.4" />
+                                    <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.75" />
+                                </linearGradient>
 
-                        <!-- Window pillar division -->
-                        <line x1="168" y1="32" x2="165" y2="58" stroke="#0f172a" stroke-width="4" />
+                                <!-- Laser LED Headlight Arc Glow -->
+                                <linearGradient id="laserBeamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#ffffff" />
+                                    <stop offset="60%" stop-color="#38bdf8" />
+                                    <stop offset="100%" stop-color="#1d4ed8" />
+                                </linearGradient>
 
-                        <!-- LED Headlight Strip (Front Right) -->
-                        <polygon points="296,69 314,72 308,76 292,74" fill="#ffffff" filter="url(#neonGlow)" />
-                        <circle cx="312" cy="73" r="3" fill="#38bdf8" filter="url(#neonGlow)" />
+                                <!-- Glowing Neon Filter -->
+                                <filter id="laserGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="3.5" result="blur" />
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                </filter>
 
-                        <!-- LED Taillight Strip (Back Left) -->
-                        <polygon points="12,74 24,73 22,78 14,80" fill="#ef4444" filter="url(#neonGlow)" />
-                        <line x1="12" y1="76" x2="26" y2="76" stroke="#f87171" stroke-width="2" filter="url(#neonGlow)" />
+                                <filter id="amberBlinkFilter" x="-40%" y="-40%" width="180%" height="180%">
+                                    <feGaussianBlur stdDeviation="4" result="blur" />
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                </filter>
+                            </defs>
 
-                        <!-- Front Wheel Arch & Wheel (Right) -->
-                        <g transform="translate(246, 88)">
-                            <circle cx="0" cy="0" r="18" fill="#0f172a" stroke="#334155" stroke-width="3" />
-                            <circle cx="0" cy="0" r="14" fill="#1e293b" />
-                            <!-- Wheel Rim rotating group -->
-                            <g class="car-wheel-rot">
-                                <circle cx="0" cy="0" r="10" stroke="#94a3b8" stroke-width="2" fill="none" />
-                                <line x1="-10" y1="0" x2="10" y2="0" stroke="#38bdf8" stroke-width="2.5" />
-                                <line x1="0" y1="-10" x2="0" y2="10" stroke="#38bdf8" stroke-width="2.5" />
-                                <line x1="-7" y1="-7" x2="7" y2="7" stroke="#94a3b8" stroke-width="2" />
-                                <line x1="-7" y1="7" x2="7" y2="-7" stroke="#94a3b8" stroke-width="2" />
-                                <circle cx="0" cy="0" r="4" fill="#38bdf8" />
+                            <!-- Ground Chassis Shadow -->
+                            <ellipse cx="270" cy="158" rx="250" ry="14" fill="rgba(0,0,0,0.85)" filter="blur(6px)" />
+
+                            <!-- Main Body Silhouette (Aerodynamic AMG GT / BMW M4 Grand Coupe stance) -->
+                            <path d="M 28 118
+                                     C 32 104, 52 96, 84 94
+                                     C 120 92, 148 64, 196 50
+                                     C 246 36, 342 36, 384 62
+                                     C 416 80, 448 92, 492 102
+                                     C 512 106, 526 116, 524 126
+                                     C 520 134, 498 140, 474 140
+                                     C 468 124, 448 112, 426 112
+                                     C 404 112, 386 124, 380 140
+                                     L 174 140
+                                     C 168 124, 150 112, 128 112
+                                     C 106 112, 88 124, 82 140
+                                     L 44 140
+                                     C 32 138, 24 128, 28 118 Z"
+                                  fill="url(#mercBodyGrad)" stroke="url(#mercChromeGrad)" stroke-width="2" />
+
+                            <!-- Hood Sculpted Power Domes & Body Crease Lines -->
+                            <path d="M 196 52 Q 320 68 494 104" stroke="rgba(255,255,255,0.45)" stroke-width="2" fill="none" />
+                            <path d="M 220 58 Q 330 74 485 108" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.5" fill="none" />
+                            <path d="M 84 96 Q 240 92 468 112" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" />
+
+                            <!-- Aerodynamic Roofline & Side Windows (Greenhouse) -->
+                            <path d="M 194 54
+                                     C 236 40, 332 40, 368 64
+                                     L 380 88
+                                     L 168 88
+                                     C 178 72, 186 62, 194 54 Z"
+                                  fill="url(#mercGlassGrad)" stroke="url(#mercChromeGrad)" stroke-width="1.8" />
+
+                            <!-- B-Pillar & Window Chrome Frame Trim -->
+                            <line x1="272" y1="44" x2="268" y2="88" stroke="#0f172a" stroke-width="5" />
+                            <line x1="272" y1="44" x2="268" y2="88" stroke="url(#mercChromeGrad)" stroke-width="1.5" />
+
+                            <!-- Interior Cockpit: Glowing Digital Steering Wheel & HUD Widescreen Display -->
+                            <rect x="220" y="68" width="42" height="12" rx="3" fill="#0284c7" opacity="0.8" filter="url(#laserGlowFilter)" />
+                            <path d="M 235 80 C 235 74, 247 74, 247 80" stroke="#38bdf8" stroke-width="2.5" fill="none" />
+
+                            <!-- ============================================================== -->
+                            <!-- ICONIC LUXURY FRONT FACIA: GRILLE, STAR / ROUNDEL & BUMPER     -->
+                            <!-- ============================================================== -->
+                            <!-- Signature Panamericana / Kidney Front Grille Outline -->
+                            <path d="M 470 102
+                                     C 488 106, 514 114, 516 126
+                                     C 514 134, 494 138, 474 138
+                                     C 472 130, 468 116, 470 102 Z"
+                                  fill="#090d16" stroke="url(#mercChromeGrad)" stroke-width="2" />
+
+                            <!-- Vertical Chrome Grille Slats (Mercedes Panamericana / BMW M Flaps) -->
+                            <line x1="478" y1="108" x2="478" y2="134" stroke="url(#mercChromeGrad)" stroke-width="2.5" />
+                            <line x1="486" y1="110" x2="486" y2="136" stroke="url(#mercChromeGrad)" stroke-width="2.5" />
+                            <line x1="494" y1="112" x2="494" y2="137" stroke="url(#mercChromeGrad)" stroke-width="2.5" />
+                            <line x1="502" y1="115" x2="502" y2="135" stroke="url(#mercChromeGrad)" stroke-width="2.5" />
+                            <line x1="510" y1="119" x2="510" y2="131" stroke="url(#mercChromeGrad)" stroke-width="2.5" />
+
+                            <!-- Prominent Luxury Star / Roundel Center Emblem -->
+                            <g transform="translate(494, 122)">
+                                <circle cx="0" cy="0" r="9" fill="#020617" stroke="url(#mercChromeGrad)" stroke-width="2" />
+                                <circle cx="0" cy="0" r="7" fill="none" stroke="#38bdf8" stroke-width="0.8" />
+                                <!-- Three-Point Star / Propeller geometry -->
+                                <line x1="0" y1="0" x2="0" y2="-7" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+                                <line x1="0" y1="0" x2="6" y2="4" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+                                <line x1="0" y1="0" x2="-6" y2="4" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+                                <circle cx="0" cy="0" r="2.5" fill="#38bdf8" filter="url(#laserGlowFilter)" />
                             </g>
-                        </g>
 
-                        <!-- Rear Wheel Arch & Wheel (Left) -->
-                        <g transform="translate(76, 88)">
-                            <circle cx="0" cy="0" r="18" fill="#0f172a" stroke="#334155" stroke-width="3" />
-                            <circle cx="0" cy="0" r="14" fill="#1e293b" />
-                            <!-- Wheel Rim rotating group -->
-                            <g class="car-wheel-rot">
-                                <circle cx="0" cy="0" r="10" stroke="#94a3b8" stroke-width="2" fill="none" />
-                                <line x1="-10" y1="0" x2="10" y2="0" stroke="#38bdf8" stroke-width="2.5" />
-                                <line x1="0" y1="-10" x2="0" y2="10" stroke="#38bdf8" stroke-width="2.5" />
-                                <line x1="-7" y1="-7" x2="7" y2="7" stroke="#94a3b8" stroke-width="2" />
-                                <line x1="-7" y1="7" x2="7" y2="-7" stroke="#94a3b8" stroke-width="2" />
-                                <circle cx="0" cy="0" r="4" fill="#38bdf8" />
+                            <!-- ============================================================== -->
+                            <!-- DUAL MULTIBEAM LASER LED HEADLIGHTS                            -->
+                            <!-- ============================================================== -->
+                            <!-- Front Headlight Housing -->
+                            <polygon points="450,102 490,106 480,116 444,110" fill="#030712" stroke="#38bdf8" stroke-width="1.5" />
+                            <!-- Laser DRL Eyebrow -->
+                            <path d="M 446 103 Q 470 105 488 107" stroke="#ffffff" stroke-width="3" filter="url(#laserGlowFilter)" stroke-linecap="round" />
+                            <!-- Dual Projector Lenses -->
+                            <circle cx="458" cy="108" r="4.5" fill="#ffffff" filter="url(#laserGlowFilter)" />
+                            <circle cx="458" cy="108" r="2.5" fill="#38bdf8" />
+                            <circle cx="474" cy="110" r="4.5" fill="#ffffff" filter="url(#laserGlowFilter)" />
+                            <circle cx="474" cy="110" r="2.5" fill="#38bdf8" />
+
+                            <!-- Dynamic Blinking Amber LED Turn Indicator on Headlight -->
+                            <path id="headlightIndicator" class="car-amber-indicator" d="M 482 106 L 492 108 L 488 112 Z" fill="#f59e0b" filter="url(#amberBlinkFilter)" />
+
+                            <!-- Side Wing Mirror with Blinking Amber Turn Signal -->
+                            <g transform="translate(372, 74)">
+                                <path d="M 0 0 C 8 -8, 24 -4, 22 8 C 16 10, 4 6, 0 0 Z" fill="#0f172a" stroke="url(#mercChromeGrad)" stroke-width="1.5" />
+                                <line id="mirrorIndicator" class="car-amber-indicator" x1="4" y1="2" x2="20" y2="4" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" filter="url(#amberBlinkFilter)" />
                             </g>
-                        </g>
-                    </svg>
+
+                            <!-- Euro / Campus License Plate on Bumper -->
+                            <g transform="translate(480, 137)">
+                                <rect x="0" y="0" width="34" height="9" rx="1.5" fill="#ffffff" stroke="#334155" stroke-width="1"/>
+                                <rect x="0" y="0" width="6" height="9" rx="1" fill="#1d4ed8"/>
+                                <text x="9" y="7" font-family="monospace" font-size="6.5" font-weight="900" fill="#0f172a">GJ-01-SP</text>
+                            </g>
+
+                            <!-- ============================================================== -->
+                            <!-- REAR OLED TAILLIGHT CLUSTER & BRAKE LIGHTS                     -->
+                            <!-- ============================================================== -->
+                            <polygon id="carTailLight" class="car-brake-light" points="28,116 46,114 42,122 26,122" fill="#ef4444" filter="url(#laserGlowFilter)" />
+                            <line x1="26" y1="118" x2="48" y2="116" stroke="#f87171" stroke-width="2.5" filter="url(#laserGlowFilter)" />
+
+                            <!-- Twin Chrome Exhaust Tips under Rear Diffuser -->
+                            <rect x="36" y="137" width="12" height="4" rx="2" fill="none" stroke="url(#mercChromeGrad)" stroke-width="1.5"/>
+                            <rect x="52" y="137" width="12" height="4" rx="2" fill="none" stroke="url(#mercChromeGrad)" stroke-width="1.5"/>
+
+                            <!-- ============================================================== -->
+                            <!-- BIG 20-INCH AMG / M-PERFORMANCE MULTI-SPOKE ALLOY WHEELS       -->
+                            <!-- ============================================================== -->
+                            <!-- FRONT WHEEL (Right) -->
+                            <g transform="translate(426, 134)">
+                                <!-- Tire Outer Rim -->
+                                <circle cx="0" cy="0" r="26" fill="#090d16" stroke="#1e293b" stroke-width="4" />
+                                <circle cx="0" cy="0" r="20" fill="#0f172a" />
+                                <!-- Red Brembo Performance Brake Caliper -->
+                                <path d="M 6 -14 C 14 -8, 16 0, 14 8" stroke="#dc2626" stroke-width="5" stroke-linecap="round" />
+                                <text x="8" y="2" font-family="sans-serif" font-size="4" font-weight="bold" fill="#ffffff">M</text>
+                                <!-- Rotating Diamond-Cut Turbine Alloy Spokes -->
+                                <g class="merc-wheel-spinning">
+                                    <circle cx="0" cy="0" r="15" stroke="url(#mercChromeGrad)" stroke-width="2" fill="none" />
+                                    <line x1="-15" y1="0" x2="15" y2="0" stroke="url(#mercChromeGrad)" stroke-width="3" />
+                                    <line x1="0" y1="-15" x2="0" y2="15" stroke="url(#mercChromeGrad)" stroke-width="3" />
+                                    <line x1="-11" y1="-11" x2="11" y2="11" stroke="url(#mercChromeGrad)" stroke-width="2.5" />
+                                    <line x1="-11" y1="11" x2="11" y2="-11" stroke="url(#mercChromeGrad)" stroke-width="2.5" />
+                                    <!-- Center Hub Cap Star -->
+                                    <circle cx="0" cy="0" r="5" fill="#020617" stroke="#38bdf8" stroke-width="1.5" />
+                                    <circle cx="0" cy="0" r="2" fill="#38bdf8" />
+                                </g>
+                            </g>
+
+                            <!-- REAR WHEEL (Left) -->
+                            <g transform="translate(128, 134)">
+                                <!-- Tire Outer Rim -->
+                                <circle cx="0" cy="0" r="26" fill="#090d16" stroke="#1e293b" stroke-width="4" />
+                                <circle cx="0" cy="0" r="20" fill="#0f172a" />
+                                <!-- Red Brembo Performance Brake Caliper -->
+                                <path d="M 6 -14 C 14 -8, 16 0, 14 8" stroke="#dc2626" stroke-width="5" stroke-linecap="round" />
+                                <!-- Rotating Diamond-Cut Turbine Alloy Spokes -->
+                                <g class="merc-wheel-spinning">
+                                    <circle cx="0" cy="0" r="15" stroke="url(#mercChromeGrad)" stroke-width="2" fill="none" />
+                                    <line x1="-15" y1="0" x2="15" y2="0" stroke="url(#mercChromeGrad)" stroke-width="3" />
+                                    <line x1="0" y1="-15" x2="0" y2="15" stroke="url(#mercChromeGrad)" stroke-width="3" />
+                                    <line x1="-11" y1="-11" x2="11" y2="11" stroke="url(#mercChromeGrad)" stroke-width="2.5" />
+                                    <line x1="-11" y1="11" x2="11" y2="-11" stroke="url(#mercChromeGrad)" stroke-width="2.5" />
+                                    <!-- Center Hub Cap Star -->
+                                    <circle cx="0" cy="0" r="5" fill="#020617" stroke="#38bdf8" stroke-width="1.5" />
+                                    <circle cx="0" cy="0" r="2" fill="#38bdf8" />
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom HUD Status Bar -->
+        <!-- Bottom Telemetry Status Strip -->
         <div class="intro-hud-bottom">
-            <div><i class="bi bi-shield-check text-success me-2"></i>SMARTPARK™ IOT GATEWAY VER. 2.6 • LIVE TELEMETRY</div>
+            <div><i class="bi bi-cpu-fill text-info me-2"></i>SMARTPARK™ AUTONOMOUS PARKING ARCHITECTURE • COLLEGE PBL-I</div>
             <div class="d-none d-md-block text-muted">Press <kbd class="bg-dark text-light border border-secondary px-2 py-1 rounded">ESC</kbd> to skip intro</div>
         </div>
     </div>

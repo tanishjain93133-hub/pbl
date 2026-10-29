@@ -727,318 +727,361 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: none;
 }
 
-/* Road surface & animated markings */
-.intro-road-container {
+/* ============================================================
+   CAMPUS PARKING DECK GROUND, BAYS & DRIVE AISLE
+   ============================================================ */
+
+/* Overhead Digital Gantry Variable Message Sign */
+.intro-gantry-board {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 220px;
-  background: linear-gradient(180deg, #090e1a 0%, #030712 100%);
-  border-top: 2px solid rgba(56, 189, 248, 0.4);
-  box-shadow: 0 -15px 35px rgba(37, 99, 235, 0.2);
-  perspective: 600px;
-}
-
-.intro-road-stripes {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 200%;
-  height: 6px;
-  background: repeating-linear-gradient(
-    90deg,
-    #38bdf8 0px,
-    #38bdf8 60px,
-    transparent 60px,
-    transparent 120px
-  );
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
-  animation: roadStripesMove 0.8s linear infinite;
-}
-
-.intro-road-curb-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, #10b981, #38bdf8, #6366f1);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
-}
-
-/* Boom Gate / Parking Barrier Structure */
-.intro-gate-station {
-  position: absolute;
-  right: 18%;
-  bottom: 80px;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.intro-gate-post {
-  width: 28px;
-  height: 90px;
-  background: linear-gradient(180deg, #334155 0%, #0f172a 100%);
-  border: 1px solid #475569;
-  border-radius: 6px 6px 0 0;
-  position: relative;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
-}
-
-.gate-status-light {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  margin: 8px auto 0;
-  background: #ef4444;
-  box-shadow: 0 0 15px #ef4444;
-  transition: all 0.4s ease;
-}
-
-.gate-status-light.granted {
-  background: #10b981;
-  box-shadow: 0 0 20px #10b981;
-}
-
-/* Pivoting Barrier Arm */
-.intro-barrier-arm {
-  position: absolute;
-  bottom: 45px;
-  left: 14px;
-  width: 180px;
-  height: 10px;
-  background: repeating-linear-gradient(
-    45deg,
-    #ef4444 0px,
-    #ef4444 14px,
-    #ffffff 14px,
-    #ffffff 28px
-  );
-  border-radius: 4px;
-  transform-origin: left center;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
-  transition: transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform: rotate(0deg);
-}
-
-.intro-barrier-arm.open {
-  transform: rotate(-68deg);
-  box-shadow: 0 0 18px rgba(16, 185, 129, 0.9);
-}
-
-/* Scanner Laser Beam */
-.intro-scanner-beam {
-  position: absolute;
-  top: -80px;
-  left: -20px;
-  width: 4px;
-  height: 170px;
-  background: linear-gradient(180deg, rgba(56, 189, 248, 0.2) 0%, #38bdf8 50%, rgba(56, 189, 248, 0.2) 100%);
-  box-shadow: 0 0 20px #38bdf8, 0 0 35px #0284c7;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.intro-scanner-beam.scanning {
-  opacity: 1;
-  animation: laserSweep 0.9s ease-in-out infinite alternate;
-}
-
-/* Entering Car Container */
-.intro-car-wrapper {
-  position: absolute;
-  bottom: 75px;
-  left: -380px;
-  z-index: 6;
-  width: 320px;
-  height: 110px;
-  animation: carEnterDrive 2.5s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
-}
-
-/* Headlight Light Cone Projecting Forward */
-.car-headlight-cone {
-  position: absolute;
-  right: -240px;
-  top: 40px;
-  width: 250px;
-  height: 80px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.75) 0%, rgba(56, 189, 248, 0.35) 40%, transparent 100%);
-  clip-path: polygon(0 35%, 100% 0%, 100% 100%, 0 65%);
-  filter: blur(6px);
-  pointer-events: none;
-  opacity: 0.95;
-  animation: headlightGlow 1.5s ease-in-out infinite alternate;
-}
-
-/* Custom Vector Sports Car Body */
-.intro-car-svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.85));
-}
-
-/* Animated Rotating Wheels */
-.car-wheel-rot {
-  transform-origin: center;
-  animation: wheelSpin 0.5s linear infinite;
-}
-
-/* Holographic Scanner HUD Card Floating over vehicle */
-.intro-hud-card {
-  position: absolute;
-  top: 18%;
+  top: 4%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 23, 42, 0.82);
-  border: 1px solid rgba(56, 189, 248, 0.4);
+  z-index: 25;
+  background: #050c18;
+  border: 2px solid rgba(56, 189, 248, 0.6);
+  border-radius: 10px;
+  padding: 0.65rem 1.5rem;
+  min-width: 640px;
+  box-shadow: 0 0 30px rgba(37, 99, 235, 0.5), inset 0 0 15px rgba(0,0,0,0.8);
+}
+.gantry-content { display: flex; flex-direction: column; gap: 0.4rem; }
+.gantry-header {
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+  padding-bottom: 0.4rem; margin-bottom: 0.3rem;
+}
+.gantry-live-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #10b981; box-shadow: 0 0 12px #10b981;
+  animation: sensorPulse 1s ease-in-out infinite;
+}
+.gantry-title {
+  font-family: monospace; font-size: 0.72rem;
+  letter-spacing: 0.12em; color: #94a3b8; text-transform: uppercase;
+}
+.gantry-metrics { display: flex; justify-content: space-around; gap: 1rem; }
+.gantry-metric { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
+.gantry-label {
+  font-family: monospace; font-size: 0.6rem;
+  color: #64748b; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.gantry-val { font-family: monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; }
+
+/* Parking Deck Ground Layout */
+.intro-parking-deck {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%; height: 75%;
+  background: linear-gradient(180deg, #08101e 0%, #030712 60%, #020810 100%);
+  border-top: 3px solid rgba(56, 189, 248, 0.5);
+  box-shadow: 0 -20px 50px rgba(37, 99, 235, 0.3);
+  overflow: visible;
+}
+.parking-deck-backdrop {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+}
+
+/* Three Parking Bays Row */
+.parking-bays-strip {
+  position: absolute; top: 0;
+  left: 50%; transform: translateX(-50%);
+  display: flex; gap: 0; align-items: flex-start;
+  z-index: 5; width: 820px;
+}
+.parking-bay-unit {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  border-right: 1px solid rgba(56, 189, 248, 0.18);
+  padding: 0.6rem 0.4rem 0; position: relative;
+}
+.parking-bay-unit:last-child { border-right: none; }
+
+/* Overhead sensor orb + label */
+.bay-overhead-sensor {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.25rem; margin-bottom: 0.4rem; z-index: 6;
+}
+.sensor-orb {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+.orb-green {
+  background: #10b981;
+  box-shadow: 0 0 18px #10b981, 0 0 35px rgba(16, 185, 129, 0.5);
+  animation: sensorPulse 1.2s ease-in-out infinite;
+}
+.orb-red {
+  background: #ef4444;
+  box-shadow: 0 0 14px #ef4444, 0 0 28px rgba(239, 68, 68, 0.4);
+}
+.sensor-code {
+  font-family: monospace; font-size: 0.6rem;
+  color: #94a3b8; letter-spacing: 0.08em; white-space: nowrap;
+}
+
+/* Bay ground painting */
+.bay-ground-area {
+  width: 100%; min-height: 130px; position: relative;
+  background: rgba(2, 8, 22, 0.4);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  border-radius: 4px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  padding-bottom: 0.3rem; overflow: hidden;
+}
+.bay-marker-line {
+  position: absolute; top: 0; bottom: 0; width: 3px;
+  background: rgba(250, 204, 21, 0.7);
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.5);
+}
+.marker-left  { left: 0; }
+.marker-right { right: 0; }
+.bay-floor-stencil {
+  font-family: monospace; font-size: 0.55rem;
+  color: rgba(148, 163, 184, 0.5);
+  letter-spacing: 0.14em; text-transform: uppercase;
+  position: absolute; bottom: 8px; z-index: 2;
+}
+.bay-wheel-stopper {
+  position: absolute; bottom: 5px; left: 15%; right: 15%; height: 5px;
+  background: repeating-linear-gradient(
+    90deg, #fbbf24 0px, #fbbf24 10px, transparent 10px, transparent 14px
+  );
+  border-radius: 3px;
+}
+.bay-scanner-hologram {
+  position: absolute; inset: 5px;
+  border: 1px dashed rgba(56, 189, 248, 0.3);
+  border-radius: 4px; opacity: 0;
+  transition: opacity 0.5s ease;
+  animation: scannerHoloPulse 1.5s ease-in-out infinite;
+}
+.bay-scanner-hologram.active { opacity: 1; }
+
+/* Parked vehicles in occupied bays */
+.parked-vehicle-card {
+  position: absolute; top: 10px; left: 8px; right: 8px; bottom: 20px;
+  display: flex; align-items: center; justify-content: center; z-index: 3;
+}
+.parked-car-svg {
+  width: 100%; height: 100%;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,0.9));
+}
+
+/* Drive Aisle */
+.parking-drive-aisle {
+  position: absolute; bottom: 0; left: 0;
+  width: 100%; height: 190px;
+  background: linear-gradient(180deg, #060d1c 0%, #030712 100%);
+  border-top: 2px dashed rgba(250, 204, 21, 0.25);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding-top: 6px; overflow: hidden;
+}
+.aisle-lane-markings {
+  position: absolute; top: 0; left: 0; width: 200%; height: 4px;
+  background: repeating-linear-gradient(
+    90deg, rgba(56, 189, 248, 0.4) 0px, rgba(56, 189, 248, 0.4) 60px,
+    transparent 60px, transparent 120px
+  );
+  animation: roadStripesMove 0.7s linear infinite;
+}
+.aisle-guidance-arrows {
+  font-family: monospace; font-size: 0.62rem;
+  color: rgba(56, 189, 248, 0.4); letter-spacing: 0.12em;
+  margin-top: 0.6rem; pointer-events: none; user-select: none;
+  animation: arrowFadeScroll 3s linear infinite;
+}
+
+/* ============================================================
+   THE BIG LUXURY MERCEDES-BENZ / BMW — STAR OF THE SHOW
+   ============================================================ */
+.intro-mercedes-container {
+  position: absolute;
+  bottom: 40px; left: -600px;
+  z-index: 10; width: 540px; height: 180px;
+  animation: mercedesDriveIn 4.5s cubic-bezier(0.15, 0.85, 0.3, 1) forwards;
+}
+
+/* Twin Volumetric Laser Headlight Beams */
+.laser-beam-cone {
+  position: absolute; top: 56px; right: -320px;
+  width: 330px; height: 70px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(56, 189, 248, 0.5) 30%,
+    rgba(37, 99, 235, 0.2) 65%,
+    transparent 100%
+  );
+  clip-path: polygon(0 30%, 100% 0%, 100% 100%, 0 70%);
+  filter: blur(5px); pointer-events: none;
+  animation: beamFlicker 1.8s ease-in-out infinite alternate;
+}
+.beam-left  { top: 53px; right: -310px; opacity: 0.9; }
+.beam-right { top: 66px; right: -310px; opacity: 0.7; }
+
+/* LiDAR Sonar Pulse from front bumper */
+.car-lidar-pulse {
+  position: absolute; right: -18px; top: 50%;
+  transform: translateY(-50%);
+  width: 12px; height: 12px; border-radius: 50%;
+  background: rgba(56, 189, 248, 0.8);
+  box-shadow: 0 0 20px #38bdf8;
+  animation: lidarPing 1.2s ease-out infinite;
+}
+
+/* The Big Mercedes SVG */
+.mercedes-luxury-svg {
+  width: 100%; height: 100%;
+  filter: drop-shadow(0 18px 30px rgba(0,0,0,0.95)) drop-shadow(0 0 15px rgba(37,99,235,0.4));
+}
+
+/* Spinning 20-inch alloy wheels */
+.merc-wheel-spinning {
+  transform-origin: center;
+  animation: wheelSpin 0.4s linear infinite;
+}
+
+/* Amber LED turn signal blinker */
+.car-amber-indicator { animation: amberBlink 0.6s step-end infinite; }
+
+/* Brake lights during parking */
+.car-brake-light { transition: all 0.3s ease; }
+.car-brake-light.braking {
+  fill: #ff0000 !important;
+  filter: drop-shadow(0 0 12px #ff0000) drop-shadow(0 0 25px #ff4444) !important;
+}
+
+/* ============================================================
+   HUD CARD (Telemetry overlay)
+   ============================================================ */
+.intro-hud-card {
+  position: absolute;
+  top: 23%; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(5, 12, 28, 0.88);
+  border: 1px solid rgba(56, 189, 248, 0.5);
   border-radius: 14px;
   padding: 1.1rem 1.6rem;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(37, 99, 235, 0.3);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.7), 0 0 30px rgba(37,99,235,0.35);
   text-align: center;
-  min-width: 340px;
-  max-width: 440px;
-  z-index: 20;
-  transition: all 0.4s ease;
+  min-width: 380px; max-width: 500px;
+  z-index: 20; transition: all 0.4s ease;
 }
-
 .intro-hud-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: monospace;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 0.35rem 0.85rem;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: monospace; font-size: 0.82rem; font-weight: 700;
+  letter-spacing: 0.05em; padding: 0.35rem 0.85rem;
   border-radius: 9999px;
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  margin-bottom: 0.75rem;
-  transition: all 0.3s ease;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);
+  margin-bottom: 0.75rem; transition: all 0.3s ease;
 }
-
 .intro-hud-status-badge.granted {
-  background: rgba(16, 185, 129, 0.2);
-  color: #34d399;
+  background: rgba(16, 185, 129, 0.2); color: #34d399;
   border-color: rgba(52, 211, 153, 0.5);
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
 }
-
-.intro-hud-title {
-  color: #ffffff;
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.intro-hud-sub {
-  color: #94a3b8;
-  font-size: 0.8rem;
-  margin-bottom: 0.85rem;
-}
-
-/* Initialization Progress Bar */
+.intro-hud-title { color: #ffffff; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
+.intro-hud-sub   { color: #94a3b8; font-size: 0.78rem; margin-bottom: 0.85rem; }
 .intro-progress-bar-wrap {
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 9999px;
-  overflow: hidden;
-  position: relative;
+  width: 100%; height: 6px;
+  background: rgba(255,255,255,0.08); border-radius: 9999px; overflow: hidden;
 }
-
 .intro-progress-bar-fill {
-  height: 100%;
-  width: 0%;
+  height: 100%; width: 0%;
   background: linear-gradient(90deg, #2563eb, #38bdf8, #10b981);
   border-radius: 9999px;
-  transition: width 2.4s cubic-bezier(0.2, 0.8, 0.25, 1);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+  transition: width 5s cubic-bezier(0.2, 0.8, 0.25, 1);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
 }
-
-/* Bottom Footer Tip */
 .intro-hud-bottom {
-  padding: 1.25rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  z-index: 10;
-  font-size: 0.8rem;
-  color: #64748b;
-  font-family: monospace;
+  padding: 1.25rem 2rem; display: flex;
+  justify-content: space-between; align-items: center;
+  position: relative; z-index: 10;
+  font-size: 0.78rem; color: #475569; font-family: monospace;
 }
 
-/* Keyframe Animations */
-@keyframes carEnterDrive {
-  0% {
-    left: -380px;
-    transform: translateY(0px);
-  }
-  50% {
-    left: 22%;
-    transform: translateY(-2px);
-  }
-  70% {
-    left: 36%;
-    transform: translateY(0px);
-  }
-  100% {
-    left: 88%;
-    transform: translateY(-1px);
-  }
+/* ============================================================
+   ALL KEYFRAME ANIMATIONS
+   ============================================================ */
+
+/* Big Mercedes: drive in → decelerate → turn into BAY A-01 → park */
+@keyframes mercedesDriveIn {
+  0%   { left: -600px; transform: translateY(0px) rotate(0deg); }
+  20%  { left: -5%;    transform: translateY(-3px) rotate(0deg); }
+  50%  { left: 8%;     transform: translateY(0px) rotate(0deg); }
+  65%  { left: 9%;     transform: translateY(0px) rotate(-5deg); }
+  80%  { left: 7%;     transform: translateY(-95px) rotate(0deg); }
+  93%  { left: 7%;     transform: translateY(-118px) rotate(0deg); }
+  100% { left: 7%;     transform: translateY(-122px) rotate(0deg); }
 }
 
 @keyframes wheelSpin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
-
 @keyframes roadStripesMove {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-120px);
-  }
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-120px); }
 }
-
 @keyframes laserSweep {
-  0% {
-    transform: translateX(-35px);
-  }
-  100% {
-    transform: translateX(35px);
-  }
+  0%   { transform: translateX(-35px); }
+  100% { transform: translateX(35px); }
 }
-
 @keyframes headlightGlow {
-  0% {
-    opacity: 0.8;
-  }
-  100% {
-    opacity: 1;
-  }
+  0%   { opacity: 0.8; }
+  100% { opacity: 1;   }
+}
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 20px rgba(56,189,248,0.4); }
+  50%       { transform: scale(1.05); box-shadow: 0 0 30px rgba(56,189,248,0.7); }
+}
+@keyframes beamFlicker {
+  0%   { opacity: 0.85; }
+  100% { opacity: 1; }
+}
+@keyframes amberBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes lidarPing {
+  0%   { box-shadow: 0 0 0 0 rgba(56,189,248,0.9); opacity: 1; }
+  100% { box-shadow: 0 0 0 60px rgba(56,189,248,0); opacity: 0; }
+}
+@keyframes sensorPulse {
+  0%, 100% { box-shadow: 0 0 18px #10b981, 0 0 35px rgba(16,185,129,0.5); }
+  50%       { box-shadow: 0 0 30px #10b981, 0 0 60px rgba(16,185,129,0.8); }
+}
+@keyframes scannerHoloPulse {
+  0%, 100% { opacity: 0; border-color: rgba(56,189,248,0.2); }
+  50%       { opacity: 0.6; border-color: rgba(56,189,248,0.7); }
+}
+@keyframes arrowFadeScroll {
+  0%   { opacity: 0.3; transform: translateX(-30px); }
+  50%  { opacity: 0.7; }
+  100% { opacity: 0.3; transform: translateX(30px); }
+}
+@keyframes bayParkedFlash {
+  0%   { background: rgba(16,185,129,0); }
+  30%  { background: rgba(16,185,129,0.25); }
+  60%  { background: rgba(16,185,129,0.12); }
+  100% { background: rgba(16,185,129,0.08); }
 }
 
-@keyframes logoPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(56, 189, 248, 0.7);
-  }
+/* Responsive */
+@media (max-width: 700px) {
+  .intro-gantry-board { min-width: 95vw; padding: 0.5rem 0.75rem; }
+  .parking-bays-strip { width: 98vw; }
+  .intro-mercedes-container { width: 360px; height: 120px; }
+  .intro-hud-card { min-width: 92vw; }
 }
 
 /* Replay Intro Floating Button on Hero / Main */
